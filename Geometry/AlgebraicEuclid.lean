@@ -269,23 +269,6 @@ def rightAngle : Angle :=
 
 notation "∟" => rightAngle
 
-lemma Angle.cancelAdd {cos₁ sin₁ norm₁ cos₂ sin₂ norm₂ cos₃ sin₃ norm₃: ℝ}
-  {nonzero₁ : norm₁ ≠ 0} {nonzero₂ : norm₂ ≠ 0} {nonzero₃ : norm₃ ≠ 0} :
-  Angle.mk' cos₁ sin₁ norm₁ nonzero₁ + Angle.mk' cos₃ sin₃ norm₃ nonzero₃ =
-  Angle.mk' cos₂ sin₂ norm₂ nonzero₂ + Angle.mk' cos₃ sin₃ norm₃ nonzero₃ ↔
-  Angle.mk' cos₁ sin₁ norm₁ nonzero₁ = Angle.mk' cos₂ sin₂ norm₂ nonzero₂
-  := by
-  constructor
-  swap
-  · intro h
-    rw [h]
-  · simp_all [euclid_simp]
-    intro h₁ h₂
-    have g₁ : cos₁^2 + sin₁^2 = norm₁^2 := by sorry
-    have g₂ : cos₂^2 + sin₂^2 = norm₂^2 := by sorry
-    have g₃ : cos₃^2 + sin₃^2 = norm₃^2 := by sorry
-    constructor <;> grind
-
 -- Weak equality of angles
 def WeakAngleEq (a b : Angle) : Prop :=
   Quotient.lift₂
@@ -376,10 +359,6 @@ def EuclidCircle.containsPoint (c : EuclidCircle) (p : EuclidPoint) : Prop :=
 
 notation p " ∈ " c => EuclidCircle.containsPoint c p
 
--- Reflection
-@[euclid_simp]
-def reflectPointAcrossLine (p : EuclidPoint) (l : Segment) : EuclidPoint := by sorry
-
 -- Rule for ∨
 @[euclid_simp]
 lemma orRule (x₁ x₂ x₃ x₄ : ℝ) :
@@ -411,3 +390,10 @@ def Noncol (p₁ p₂ p₃ : EuclidPoint) (t : ℝ): Prop :=
 @[euclid_simp]
 def Between (p₁ p₂ p₃ : EuclidPoint) : Prop :=
   |p₁ -ₛ p₂| + |p₂ -ₛ p₃| = |p₁ -ₛ p₃|
+
+-- Area
+@[euclid_simp]
+noncomputable
+def Area (p₁ p₂ p₃ : EuclidPoint) : ℝ :=
+  2⁻¹ * ((p₂.x - p₁.x) * (p₃.y - p₁.y) -
+  (p₂.y - p₁.y) * (p₃.x - p₁.x))
