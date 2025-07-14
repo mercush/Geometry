@@ -96,3 +96,19 @@ lemma BetweenCol (x y z : EuclidPoint)
   (h₁ : Between x y z) :
   Col x y z := by
   algebraic_euclid
+
+theorem MediansConcurrent (A B C M₁ M₂ M₃ G : EuclidPoint)
+  (h₂ : 2 * M₁.x = B.x + C.x)
+  (h₃ : 2 * M₁.y = B.y + C.y)
+
+  (h₄ : 2 * M₂.x = A.x + C.x)
+  (h₅ : 2 * M₂.y = A.y + C.y)
+
+  (h₆ : 2 * M₃.x = A.x + B.x)
+  (h₇ : 2 * M₃.y = A.y + B.y)
+
+  (h₈ : 3 * G.x = A.x + B.x + C.x)
+  (h₉ : 3 * G.y = A.y + B.y + C.y)
+
+  : Col A G M₁ ∧ Col B G M₂ ∧ Col C G M₃ := by
+  algebraic_euclid

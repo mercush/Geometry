@@ -9,4 +9,5 @@ macro "algebraic_euclid" : tactic =>
     | simp_all only [euclid_simp]
     | rw [Segment.length_sq_iff]
     | constructor)
-    <;> grind (splits := 0) -cutsat -linarith -mbtc (ringSteps := 10000000))
+    <;>
+    grind (splits := 0) -cutsat -linarith -mbtc)
