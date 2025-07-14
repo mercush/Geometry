@@ -52,7 +52,7 @@ theorem Proposition13 (x₁ x₂ x₃ x₄ : EuclidPoint) (t₁ t₂ t₃ : ℝ)
   := by
   algebraic_euclid
 
-theorem Proposition30 (x₁ x₂ x₃ x₄ x₅ x₆ : EuclidPoint) (t : ℝ)
+  theorem Proposition30 (x₁ x₂ x₃ x₄ x₅ x₆ : EuclidPoint) (t : ℝ)
   (h₁ : (x₁ -ₛ x₂) || (x₃ -ₛ x₄))
   (h₂ : (x₃ -ₛ x₄) || (x₅ -ₛ x₆))
   (h₃ : Uneq x₃ x₄ t)
@@ -89,4 +89,10 @@ theorem Proposition47 (z₁ z₂ z₃ : EuclidPoint)
 theorem Proposition48 (z₁ z₂ z₃ : EuclidPoint)
   (h₁ : |z₃ -ₛ z₂|^2 = |z₂ -ₛ z₁|^2 + |z₃ -ₛ z₁|^2) :
   (z₂ -ₛ z₁) ⊥ (z₃ -ₛ z₁) := by
+  algebraic_euclid
+
+-- BONUS
+lemma BetweenCol (x y z : EuclidPoint)
+  (h₁ : Between x y z) :
+  Col x y z := by
   algebraic_euclid
