@@ -13,33 +13,43 @@ def EuclidPoint.add (p₁ p₂ : EuclidPoint) : EuclidPoint := ⟨p₁.x + p₂.
 def EuclidPoint.sub (p₁ p₂ : EuclidPoint) : EuclidPoint := ⟨p₁.x - p₂.x, p₁.y - p₂.y⟩
 def EuclidPoint.scale (t : ℝ) (p : EuclidPoint) : EuclidPoint := ⟨t * p.x, t * p.y⟩
 
-notation p₁ " +ₚ " p₂ => EuclidPoint.add p₁ p₂
+instance : Add EuclidPoint where
+  add := EuclidPoint.add
 
-@[euclid_simp]
-lemma EuclidPoint.add_def (p₁ p₂ : EuclidPoint) :
-  (p₁ +ₚ p₂) = EuclidPoint.mk (p₁.x + p₂.x) (p₁.y + p₂.y) := rfl
+-- @[euclid_simp]
+-- lemma EuclidPoint.add_def (p₁ p₂ : EuclidPoint) :
+--   (p₁ + p₂) = EuclidPoint.mk (p₁.x + p₂.x) (p₁.y + p₂.y) := rfl
 
-notation t " •ₚ " p => EuclidPoint.scale t p
+instance : HSMul ℝ EuclidPoint EuclidPoint where
+  hSMul := EuclidPoint.scale
 
-@[euclid_simp]
-lemma EuclidPoint.scale_def (t : ℝ) (p : EuclidPoint) :
-  (t •ₚ p) = EuclidPoint.mk (t * p.x) (t * p.y) := rfl
+-- @[euclid_simp]
+-- lemma EuclidPoint.scale_def (t : ℝ) (p : EuclidPoint) :
+--   (t • p) = EuclidPoint.mk (t * p.x) (t * p.y) := rfl
 
 -- Segment definition
 structure Segment where
   start : EuclidPoint
   endpoint : EuclidPoint
 
-notation A " -ₛ " B => Segment.mk A B
-
--- Direction of segment
-def Segment.direction (seg : Segment) : EuclidPoint :=
-⟨seg.endpoint.x - seg.start.x, seg.endpoint.y - seg.start.y⟩
+-- notation A " - " B => Segment.mk A B
+instance : HSub EuclidPoint EuclidPoint Segment where
+  hSub := Segment.mk
 
 @[euclid_simp]
-lemma Segment.direction_def (seg : Segment) :
-  seg.direction = ⟨seg.endpoint.x - seg.start.x, seg.endpoint.y - seg.start.y⟩ := rfl
+lemma Segment.endpoint_def (x₁ x₂ : EuclidPoint) :
+  (x₁ - x₂).endpoint = x₂ := by
+  simp [HSub.hSub]
 
+@[euclid_simp]
+lemma Segment.start_def (x₁ x₂ : EuclidPoint) :
+  (x₁ - x₂).start = x₁ := by
+  simp [HSub.hSub]
+
+-- Direction of segment
+@[euclid_simp]
+def Segment.direction (seg : Segment) : EuclidPoint :=
+⟨seg.endpoint.x - seg.start.x, seg.endpoint.y - seg.start.y⟩
 
 -- Length of segment
 noncomputable
@@ -47,17 +57,13 @@ def Segment.length (seg : Segment) : ℝ := Real.sqrt ((seg.endpoint.x - seg.sta
 
 notation "|" seg "|" => Segment.length seg
 
-lemma Segment.length_def (seg : Segment) :
-  seg.length = Real.sqrt ((seg.endpoint.x - seg.start.x)^2 + (seg.endpoint.y - seg.start.y)^2) := rfl
-
-lemma Segment.length_sq_eq {a b : EuclidPoint}: |a -ₛ b| ^ 2 = (a.x - b.x) ^ 2 + (a.y - b.y) ^ 2 := by
-  rw [Segment.length_def]
+lemma Segment.length_sq_eq {a b : EuclidPoint}: |a - b| ^ 2 = (a.x - b.x) ^ 2 + (a.y - b.y) ^ 2 := by
+  rw [Segment.length]
   have h : 0 ≤ (b.x - a.x)^2 + (b.y - a.y)^2 := by nlinarith
-  simp
-  rw [Real.sq_sqrt h]
+  simp_all [euclid_simp]
   nlinarith
 
-grind_pattern Segment.length_sq_eq => |a -ₛ b|
+grind_pattern Segment.length_sq_eq => |a - b|
 
 -- @[euclid_simp]
 lemma Segment.length_sq_iff {s₁ s₂ : Segment} :
@@ -66,10 +72,10 @@ lemma Segment.length_sq_iff {s₁ s₂ : Segment} :
   swap
   · intro h
     have hs₁ : 0 ≤ |s₁| := by
-      rw [Segment.length_def]
+      rw [Segment.length]
       simp
     have hs₂ : 0 ≤ |s₂| := by
-      rw [Segment.length_def]
+      rw [Segment.length]
       simp
     rw [←Real.sqrt_sq hs₁, ←Real.sqrt_sq hs₂, h]
   · intro h
@@ -80,7 +86,7 @@ lemma Segment.length_eq_zero_iff {s : Segment} :
   constructor
   · intro h
     have hs : 0 ≤ |s| := by
-      rw [Segment.length_def]
+      rw [Segment.length]
       simp
     rw [←Real.sqrt_sq hs, h]
     simp
@@ -90,58 +96,55 @@ lemma Segment.length_eq_zero_iff {s : Segment} :
 
 @[grind]
 lemma Segment.length_symm {a b : EuclidPoint} :
-  |a -ₛ b| = |b -ₛ a| := by
-  rw [Segment.length_def, Segment.length_def]
-  simp
-  ring_nf
+  |a - b| = |b - a| := by
+  rw [Segment.length_sq_iff]
 
--- Unequal definition
-@[euclid_simp]
-def Uneq (a b : EuclidPoint) (t : ℝ) : Prop :=
-  |a -ₛ b| * t = 1
-
-lemma Uneq.symm {a b : EuclidPoint} {t : ℝ} (h : Uneq a b t) :
-  Uneq b a t := by
+  rw [Segment.length, Segment.length]
   simp_all only [euclid_simp]
-  rw [Segment.length_symm] at h
-  exact h
 
-lemma uneq_if {a b : EuclidPoint} {t : ℝ} :
-  Uneq a b t → |a -ₛ b| ≠ 0 := by
-  intro h
-  simp_all [euclid_simp]
-  by_contra h'
-  rw [h'] at h
-  simp_all
+  have h₁ : ((b.x - a.x) ^ 2 + (b.y - a.y) ^ 2) ≥ 0 := by positivity
+  have h₂ : ((a.x - b.x) ^ 2 + (a.y - b.y) ^ 2) ≥ 0 := by positivity
+  rw [Real.sq_sqrt h₁, Real.sq_sqrt h₂]
+  nlinarith
 
-postfix:max "~" => Uneq.symm
+@[euclid_simp]
+lemma ne_zero_iff_exist_inv {a b : EuclidPoint} :
+  |a - b| ≠ 0 ↔ ∃ t, |a - b| * t = 1 := by
+  constructor
+  swap
+  · intro h
+    obtain ⟨t, ht⟩ := h
+    by_contra h'
+    rw [h'] at ht
+    simp_all
+  · intro h
+    use |a - b|⁻¹
+    field_simp
 
 -- Dot product
+@[euclid_simp]
 def EuclidPoint.dot (p₁ p₂ : EuclidPoint) : ℝ :=
   p₁.x * p₂.x + p₁.y * p₂.y
 
-@[euclid_simp]
-lemma EuclidPoint.dot_def (p₁ p₂ : EuclidPoint) :
-  p₁.dot p₂ = p₁.x * p₂.x + p₁.y * p₂.y := rfl
+-- @[euclid_simp]
+-- lemma EuclidPoint.dot_def (p₁ p₂ : EuclidPoint) :
+--   p₁.dot p₂ = p₁.x * p₂.x + p₁.y * p₂.y := rfl
 
+@[euclid_simp]
 def Segment.dot (seg₁ seg₂ : Segment) : ℝ :=
   EuclidPoint.dot seg₁.direction seg₂.direction
 
-@[euclid_simp]
-lemma Segment.dot_def (seg₁ seg₂ : Segment) :
-  seg₁.dot seg₂ = (seg₁.endpoint.x - seg₁.start.x) * (seg₂.endpoint.x - seg₂.start.x) +
-  (seg₁.endpoint.y - seg₁.start.y) * (seg₂.endpoint.y - seg₂.start.y) := rfl
-
 -- Orthogonality of segments
+@[euclid_simp]
 def Segment.orthogonal (seg₁ seg₂ : Segment) : Prop :=
   Segment.dot seg₁ seg₂ = 0
 
 notation seg1 " ⊥ " seg2 => Segment.orthogonal seg1 seg2
 
-@[euclid_simp]
-lemma Segment.orthogonal_def (seg₁ seg₂ : Segment) :
-  seg₁.orthogonal seg₂ ↔ (seg₁.endpoint.x - seg₁.start.x) * (seg₂.endpoint.x - seg₂.start.x) +
-  (seg₁.endpoint.y - seg₁.start.y) * (seg₂.endpoint.y - seg₂.start.y) = 0 := by rfl
+-- @[euclid_simp]
+-- lemma Segment.orthogonal_def (seg₁ seg₂ : Segment) :
+--   seg₁.orthogonal seg₂ ↔ (seg₁.endpoint.x - seg₁.start.x) * (seg₂.endpoint.x - seg₂.start.x) +
+--   (seg₁.endpoint.y - seg₁.start.y) * (seg₂.endpoint.y - seg₂.start.y) = 0 := by rfl
 
 -- Parallel segments
 @[euclid_simp]
@@ -189,16 +192,16 @@ instance Angle.instSetoid : Setoid Angle' where
 def Angle := Quotient Angle.instSetoid
 
 noncomputable
-def Angle.mk {x₁ x₂ x₃ x₄ : EuclidPoint} {t₁ t₂ : ℝ}
-  (h₁ : Uneq x₁ x₂ t₁) -- |x₁ -ₛ x₂| ≠ 0)
-  (h₂ : Uneq x₃ x₄ t₂)-- |x₁ -ₛ x₃| ≠ 0)
+def Angle.mk {x₁ x₂ x₃ x₄ : EuclidPoint}
+  (h₁ : |x₁ - x₂| ≠ 0)
+  (h₂ : |x₃ - x₄| ≠ 0)
   : Angle :=
   Quotient.mk'
   (Angle'.mk
   ((x₂.x - x₁.x) * (x₄.x - x₃.x) + (x₂.y - x₁.y) * (x₄.y - x₃.y))
   ((x₂.x - x₁.x) * (x₄.y - x₃.y) - (x₂.y - x₁.y) * (x₄.x - x₃.x))
-  (|x₁ -ₛ x₂| * |x₃ -ₛ x₄|)
-  (by apply uneq_if at h₁; apply uneq_if at h₂; aesop))
+  (|x₁ - x₂| * |x₃ - x₄|)
+  (by aesop))
 
 notation "∠" => Angle.mk
 
@@ -206,11 +209,11 @@ def Angle.mk' (cos sin norm : ℝ) (h : norm ≠ 0) : Angle :=
   Quotient.mk' (Angle'.mk cos sin norm h)
 
 @[euclid_simp]
-lemma Angle.coordToTrig {x₁ x₂ x₃ x₄ : EuclidPoint} {t₁ t₂ : ℝ}
-  {h₁ : Uneq x₁ x₂ t₁} {h₂ : Uneq x₃ x₄ t₂} :
+lemma Angle.coordToTrig {x₁ x₂ x₃ x₄ : EuclidPoint}
+  {h₁ : |x₁ - x₂| ≠ 0} {h₂ : |x₃ - x₄| ≠ 0} :
   Angle.mk h₁ h₂ = Angle.mk' ((x₂.x - x₁.x) * (x₄.x - x₃.x) + (x₂.y - x₁.y) * (x₄.y - x₃.y))
     ((x₂.x - x₁.x) * (x₄.y - x₃.y) - (x₂.y - x₁.y) * (x₄.x - x₃.x))
-    (|x₁ -ₛ x₂| * |x₃ -ₛ x₄|) (by apply uneq_if at h₁; apply uneq_if at h₂; aesop) := rfl
+    (|x₁ - x₂| * |x₃ - x₄|) (by aesop) := rfl
 
 @[euclid_simp]
 lemma Angle.eq' {cos₁ sin₁ norm₁ : ℝ} {nonzero₁ : norm₁ ≠ 0}
@@ -270,6 +273,7 @@ def rightAngle : Angle :=
 notation "∟" => rightAngle
 
 -- Weak equality of angles
+-- @[euclid_simp]
 def WeakAngleEq (a b : Angle) : Prop :=
   Quotient.lift₂
     (fun a' b' => a'.cos * b'.norm = b'.cos * a'.norm)
@@ -307,44 +311,32 @@ structure Line where
   seg : Segment
 
 -- Parrallel and orthogonal lines
+@[euclid_simp]
 def Line.parallel (l₁ l₂ : Line) : Prop :=
   l₁.seg.parallel l₂.seg
 
 notation l₁ " || " l₂ => Line.parallel l₁ l₂
 
 @[euclid_simp]
-lemma Line.parallel_def (l₁ l₂ : Line) :
-  l₁.parallel l₂ ↔ l₁.seg.parallel l₂.seg := by rfl
-
 def Line.orthogonal (l₁ l₂ : Line) : Prop :=
   l₁.seg.orthogonal l₂.seg
 
 notation l₁ " ⊥ " l₂ => Line.orthogonal l₁ l₂
 
-@[euclid_simp]
-lemma Line.orthogonal_def (l₁ l₂ : Line) :
-  l₁.orthogonal l₂ ↔ l₁.seg.orthogonal l₂.seg := by rfl
-
 -- Line containment
+@[euclid_simp]
 def Line.containsPoint (p : EuclidPoint) (l : Line) : Prop :=
   (p.x - l.seg.start.x) * (l.seg.endpoint.y - l.seg.start.y)
   - (p.y - l.seg.start.y) * (l.seg.endpoint.x - l.seg.start.x) = 0
 
 notation p " ∈ " l => Line.containsPoint p l
 
+@[euclid_simp]
 def Line.containsSegment (s : Segment) (l : Line) : Prop :=
   (s.start ∈ l) ∧ (s.endpoint ∈ l)
 
 notation p " ∈ " l => Line.containsSegment p l
 
-@[euclid_simp]
-lemma Line.containsPoint_def (p : EuclidPoint) (l : Line) :
-  (p ∈ l) ↔ (p.x - l.seg.start.x) * (l.seg.endpoint.y - l.seg.start.y)
-  - (p.y - l.seg.start.y) * (l.seg.endpoint.x - l.seg.start.x) = 0 := by rfl
-
-@[euclid_simp]
-lemma Line.containsSegment_def (s : Segment) (l : Line) :
-  (s ∈ l) ↔ (s.start ∈ l) ∧ (s.endpoint ∈ l) := by rfl
 -- Existence of points will follow from using Buchberger algorithm and checking
 -- if 1 is in the Grobner basis.
 
@@ -382,14 +374,14 @@ def Col (p₁ p₂ p₃ : EuclidPoint) : Prop :=
 
 -- Noncollinearity
 @[euclid_simp]
-def Noncol (p₁ p₂ p₃ : EuclidPoint) (t : ℝ): Prop :=
+def Noncol (p₁ p₂ p₃ : EuclidPoint) : Prop := ∃ t,
   t * ((p₂.x - p₁.x) * (p₃.y - p₁.y) -
   (p₂.y - p₁.y) * (p₃.x - p₁.x)) = 1
 
 -- Betweenness
 @[euclid_simp]
 def Between (p₁ p₂ p₃ : EuclidPoint) : Prop :=
-  |p₁ -ₛ p₂| + |p₂ -ₛ p₃| = |p₁ -ₛ p₃|
+  |p₁ - p₂| + |p₂ - p₃| = |p₁ - p₃|
 
 -- Area
 @[euclid_simp]
@@ -397,3 +389,11 @@ noncomputable
 def Area (p₁ p₂ p₃ : EuclidPoint) : ℝ :=
   2⁻¹ * ((p₂.x - p₁.x) * (p₃.y - p₁.y) -
   (p₂.y - p₁.y) * (p₃.x - p₁.x))
+
+-- Strong parallelism
+@[euclid_simp]
+def StrongParallel (seg₁ seg₂ : Segment) : Prop :=
+  (seg₁.endpoint.x - seg₁.start.x) * (seg₂.endpoint.x - seg₂.start.x) +
+  (seg₁.endpoint.y - seg₁.start.y) * (seg₂.endpoint.y - seg₂.start.y) = |seg₁| * |seg₂|
+
+notation seg₁ " ||| " seg₂ => StrongParallel seg₁ seg₂

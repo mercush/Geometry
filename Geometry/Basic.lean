@@ -1,94 +1,93 @@
 import Geometry.AlgebraicEuclid
 import Geometry.Tactic
 
-theorem Proposition4 (x₁ x₂ x₃ y₁ y₂ y₃: EuclidPoint) (t₁ t₂ : ℝ)
-  (h₁ : |x₁ -ₛ x₂| = |y₁ -ₛ y₂|)
-  (h₂ : |x₁ -ₛ x₃| = |y₁ -ₛ y₃|)
-  (h_zero₁ : Uneq x₁ x₂ t₁)
-  (h_zero₂ : Uneq x₁ x₃ t₂)
-  (h₃ : Angle.mk h_zero₁ h_zero₂ = Angle.mk
-  (by simp_all [euclid_simp] : Uneq y₁ y₂ t₁)
-  (by simp_all [euclid_simp] : Uneq y₁ y₃ t₂))
+theorem Proposition4 (x₁ x₂ x₃ y₁ y₂ y₃: EuclidPoint)
+  (h₁ : |x₁ - x₂| = |y₁ - y₂|)
+  (h₂ : |x₁ - x₃| = |y₁ - y₃|)
+  (h_zero₁ : |x₁ - x₂| ≠ 0)
+  (h_zero₂ : |x₁ - x₃| ≠ 0)
+  (h₃ : ∠ h_zero₁ h_zero₂ =
+  ∠ (by degen : |y₁ - y₂| ≠ 0) (by degen : |y₁ - y₃| ≠ 0))
   :
-  |x₂ -ₛ x₃| = |y₂ -ₛ y₃| := by
+  |x₂ - x₃| = |y₂ - y₃| := by
+
   algebraic_euclid
 
-theorem Proposition5 (x₁ x₂ x₃: EuclidPoint) (t₁ t₂ t₃ : ℝ)
-  (h₁ : |x₁ -ₛ x₂| = |x₁ -ₛ x₃|)
-  (h₂ : Uneq x₂ x₁ t₁)
-  (h₃ : Uneq x₂ x₃ t₂)
-  (h₄ : Uneq x₃ x₁ t₃):
-  Angle.mk h₂ h₃ = Angle.mk h₃~ h₄
+theorem Proposition5 (x₁ x₂ x₃: EuclidPoint)
+  (h₁ : |x₁ - x₂| = |x₁ - x₃|)
+  (h₂ : |x₂ - x₁| ≠ 0)
+  (h₃ : |x₂ - x₃| ≠ 0)
+  (h₄ : |x₃ - x₁| ≠ 0):
+  ∠ h₂ h₃ = ∠ (by degen : |x₃ - x₂| ≠ 0) h₄
   := by
   algebraic_euclid
 
-theorem Proposition6 (x₁ x₂ x₃ : EuclidPoint) (t₁ t₂ t₃ s₁ : ℝ)
-  (h₁ : Uneq x₂ x₁ t₁)
-  (h₂ : Uneq x₂ x₃ t₂)
-  (h₃ : Uneq x₃ x₁ t₃)
-  (h₄ : Angle.mk h₁ h₂ = Angle.mk h₂~ h₃)
-  (h₅ : Noncol x₁ x₂ x₃ s₁)
-  : |x₁ -ₛ x₂| = |x₁ -ₛ x₃| := by
+theorem Proposition6 (x₁ x₂ x₃ : EuclidPoint)
+  (h₁ : |x₂ - x₁| ≠ 0)
+  (h₂ : |x₂ - x₃| ≠ 0)
+  (h₃ : |x₃ - x₁| ≠ 0)
+  (h₄ : ∠ h₁ h₂ = ∠ (by degen : |x₃ - x₂| ≠ 0) h₃)
+  (h₅ : Noncol x₁ x₂ x₃)
+  : |x₁ - x₂| = |x₁ - x₃| := by
   algebraic_euclid
 
-theorem Proposition8 (x₁ x₂ x₃ y₁ y₂ y₃ : EuclidPoint) (t₁ t₂ : ℝ)
-  (h₁ : |x₁ -ₛ x₂| = |y₁ -ₛ y₂|)
-  (h₂ : |x₂ -ₛ x₃| = |y₂ -ₛ y₃|)
-  (h₃ : |x₁ -ₛ x₃| = |y₁ -ₛ y₃|)
-  (h₄ : Uneq x₁ x₂ t₁)
-  (h₅ : Uneq x₃ x₁ t₂) :
-  WeakAngleEq (Angle.mk h₄ h₅~)
-  (Angle.mk (by simp_all [euclid_simp] : Uneq y₁ y₂ t₁)
-  (by simp_all [euclid_simp, ←h₃, Segment.length_symm] : Uneq y₁ y₃ t₂))
+theorem Proposition8 (x₁ x₂ x₃ y₁ y₂ y₃ : EuclidPoint)
+  (h₁ : |x₁ - x₂| = |y₁ - y₂|)
+  (h₂ : |x₂ - x₃| = |y₂ - y₃|)
+  (h₃ : |x₁ - x₃| = |y₁ - y₃|)
+  (h₄ : |x₁ - x₂| ≠ 0)
+  (h₅ : |x₃ - x₁| ≠ 0) :
+  WeakAngleEq (∠ h₄ (by degen : |x₁ - x₃| ≠ 0))
+  (∠ (by degen : |y₁ - y₂| ≠ 0)
+  (by degen : |y₁ - y₃| ≠ 0))
   := by
   algebraic_euclid
 
-theorem Proposition13 (x₁ x₂ x₃ x₄ : EuclidPoint) (t₁ t₂ t₃ : ℝ)
-  (h₁ : Uneq x₄ x₁ t₁)
-  (h₂ : Uneq x₄ x₂ t₂)
-  (h₃ : Uneq x₄ x₃ t₃)
+theorem Proposition13 (x₁ x₂ x₃ x₄ : EuclidPoint)
+  (h₁ : |x₄ - x₁| ≠ 0)
+  (h₂ : |x₄ - x₂| ≠ 0)
+  (h₃ : |x₄ - x₃| ≠ 0)
   (h₄ : Between x₁ x₄ x₂)
-  : ((Angle.mk h₁ h₃) + (Angle.mk h₃ h₂)) = (∟ + ∟)
+  : ((∠ h₁ h₃) + (∠ h₃ h₂)) = (∟ + ∟)
   := by
   algebraic_euclid
 
-  theorem Proposition30 (x₁ x₂ x₃ x₄ x₅ x₆ : EuclidPoint) (t : ℝ)
-  (h₁ : (x₁ -ₛ x₂) || (x₃ -ₛ x₄))
-  (h₂ : (x₃ -ₛ x₄) || (x₅ -ₛ x₆))
-  (h₃ : Uneq x₃ x₄ t)
-  : (x₁ -ₛ x₂) || (x₅ -ₛ x₆) := by
+  theorem Proposition30 (x₁ x₂ x₃ x₄ x₅ x₆ : EuclidPoint)
+  (h₁ : (x₁ - x₂) || (x₃ - x₄))
+  (h₂ : (x₃ - x₄) || (x₅ - x₆))
+  (h₃ : |x₃ - x₄| ≠ 0)
+  : (x₁ - x₂) || (x₅ - x₆) := by
   algebraic_euclid
 
-theorem Proposition32 (x₁ x₂ x₃ : EuclidPoint) (t₁ t₂ t₃ : ℝ)
-  (h₁ : Uneq x₁ x₂ t₁)
-  (h₂ : Uneq x₁ x₃ t₂)
-  (h₃ : Uneq x₂ x₃ t₃)
+theorem Proposition32 (x₁ x₂ x₃ : EuclidPoint)
+  (h₁ : |x₁ - x₂| ≠ 0)
+  (h₂ : |x₁ - x₃| ≠ 0)
+  (h₃ : |x₂ - x₃| ≠ 0)
   :
-  (Angle.mk h₁ h₂ +
-  Angle.mk h₃ h₁~ +
-  Angle.mk h₂~ h₃~) = (∟ + ∟) := by
+  (∠ h₁ h₂ + ∠ h₃ (by degen : |x₂ - x₁| ≠ 0) +
+  ∠ (by degen : |x₃ - x₁| ≠ 0) (by degen : |x₃ - x₂| ≠ 0)) = (∟ + ∟) := by
   algebraic_euclid
 
-theorem Proposition33 (x₁ x₂ x₃ x₄ : EuclidPoint) (t₁ : ℝ)
-  (h₁ : (x₁ -ₛ x₂) || (x₃ -ₛ x₄))
-  (h₂ : (x₁ -ₛ x₃) || (x₂ -ₛ x₄))
-  (h₃ : Noncol x₁ x₂ x₃ t₁)
-  : |x₁ -ₛ x₃| = |x₂ -ₛ x₄| := by
+theorem Proposition33 (x₁ x₂ x₃ x₄ : EuclidPoint)
+  (h₁ : (x₁ - x₂) || (x₃ - x₄))
+  (h₂ : (x₁ - x₃) || (x₂ - x₄))
+  (h₃ : Noncol x₁ x₂ x₃)
+  : |x₁ - x₃| = |x₂ - x₄| := by
   algebraic_euclid
 
 theorem Proposition37 (x₁ x₂ x₃ x₄ : EuclidPoint)
-  (h₁ : (x₃ -ₛ x₄) || (x₁ -ₛ x₂)) :
+  (h₁ : (x₃ - x₄) || (x₁ - x₂)) :
   Area x₁ x₂ x₃ = Area x₁ x₂ x₄ := by
   algebraic_euclid
 
 theorem Proposition47 (z₁ z₂ z₃ : EuclidPoint)
-  (h₁ : (z₂ -ₛ z₁) ⊥ (z₃ -ₛ z₁)) :
-  |z₃ -ₛ z₂|^2 = |z₂ -ₛ z₁|^2 + |z₃ -ₛ z₁|^2 := by
+  (h₁ : (z₂ - z₁) ⊥ (z₃ - z₁)) :
+  |z₃ - z₂|^2 = |z₂ - z₁|^2 + |z₃ - z₁|^2 := by
   algebraic_euclid
 
 theorem Proposition48 (z₁ z₂ z₃ : EuclidPoint)
-  (h₁ : |z₃ -ₛ z₂|^2 = |z₂ -ₛ z₁|^2 + |z₃ -ₛ z₁|^2) :
-  (z₂ -ₛ z₁) ⊥ (z₃ -ₛ z₁) := by
+  (h₁ : |z₃ - z₂|^2 = |z₂ - z₁|^2 + |z₃ - z₁|^2) :
+  (z₂ - z₁) ⊥ (z₃ - z₁) := by
   algebraic_euclid
 
 -- BONUS
