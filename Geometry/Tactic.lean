@@ -1,5 +1,5 @@
 import Geometry.AlgebraicEuclid
-open Lean Meta Elab Tactic
+open Lean Meta Elab Tactic Term
 
 
 macro "algebraic_euclid" : tactic =>
@@ -9,9 +9,13 @@ macro "algebraic_euclid" : tactic =>
     | simp_all only [euclid_simp]
     | (obtain ⟨t, ht⟩) -- Maybe should be {}
     | rw [Segment.length_sq_iff]
+    | rw [EuclidPoint.pointEq]
     | constructor))
     <;>
-    grind (splits := 0) -cutsat -linarith -mbtc)
+    set_option trace.grind.ring.internalize true in
+    set_option trace.grind.debug.ring.basis true in
+    set_option trace.grind.ematch.instance true in
+    grind (splits := 0) -splitMatch -splitIte -splitIndPred -splitImp -linarith -cutsat)
 
-macro "degen" : tactic =>
-  `(tactic|grind (splits := 0) -cutsat -linarith -mbtc)
+macro "nondegen" : tactic =>
+  `(tactic|grind (splits := 0) -splitMatch -splitIte -splitIndPred -splitImp -linarith -cutsat)

@@ -1,31 +1,24 @@
+-- Minimal required imports
 import Mathlib
+
 import Geometry.Simp
 
--- Point definition
 structure EuclidPoint where
   x : ℝ
   y : ℝ
 
-def O := EuclidPoint.mk 0 0
-def I := EuclidPoint.mk 1 0
-
 def EuclidPoint.add (p₁ p₂ : EuclidPoint) : EuclidPoint := ⟨p₁.x + p₂.x, p₁.y + p₂.y⟩
-def EuclidPoint.sub (p₁ p₂ : EuclidPoint) : EuclidPoint := ⟨p₁.x - p₂.x, p₁.y - p₂.y⟩
 def EuclidPoint.scale (t : ℝ) (p : EuclidPoint) : EuclidPoint := ⟨t * p.x, t * p.y⟩
 
 instance : Add EuclidPoint where
   add := EuclidPoint.add
 
--- @[euclid_simp]
--- lemma EuclidPoint.add_def (p₁ p₂ : EuclidPoint) :
---   (p₁ + p₂) = EuclidPoint.mk (p₁.x + p₂.x) (p₁.y + p₂.y) := rfl
-
 instance : HSMul ℝ EuclidPoint EuclidPoint where
   hSMul := EuclidPoint.scale
 
--- @[euclid_simp]
--- lemma EuclidPoint.scale_def (t : ℝ) (p : EuclidPoint) :
---   (t • p) = EuclidPoint.mk (t * p.x) (t * p.y) := rfl
+@[ext]
+lemma EuclidPoint.ext (A B : EuclidPoint) (h₁ : A.x = B.x) (h₂ : A.y = B.y) : A = B := by
+  cases A; cases B; simp at h₁ h₂; rw [h₁, h₂]
 
 -- Segment definition
 structure Segment where
@@ -82,16 +75,16 @@ lemma Segment.length_sq_iff {s₁ s₂ : Segment} :
     rw [h]
 
 lemma Segment.length_eq_zero_iff {s : Segment} :
-  |s|^2 = 0 ↔ |s| = 0 := by
+  |s| = 0 ↔ |s|^2 = 0 := by
   constructor
+  · intro h
+    rw [h]
+    simp
   · intro h
     have hs : 0 ≤ |s| := by
       rw [Segment.length]
       simp
     rw [←Real.sqrt_sq hs, h]
-    simp
-  · intro h
-    rw [h]
     simp
 
 @[grind]
@@ -107,7 +100,6 @@ lemma Segment.length_symm {a b : EuclidPoint} :
   rw [Real.sq_sqrt h₁, Real.sq_sqrt h₂]
   nlinarith
 
-@[euclid_simp]
 lemma ne_zero_iff_exist_inv {a b : EuclidPoint} :
   |a - b| ≠ 0 ↔ ∃ t, |a - b| * t = 1 := by
   constructor
@@ -121,14 +113,14 @@ lemma ne_zero_iff_exist_inv {a b : EuclidPoint} :
     use |a - b|⁻¹
     field_simp
 
+lemma ne_zero_iff_exist_inv' {a b : ℝ} :
+  a ≠ b ↔ ∃ t, (a - b) * t = 1 := by
+  grind
+
 -- Dot product
 @[euclid_simp]
 def EuclidPoint.dot (p₁ p₂ : EuclidPoint) : ℝ :=
   p₁.x * p₂.x + p₁.y * p₂.y
-
--- @[euclid_simp]
--- lemma EuclidPoint.dot_def (p₁ p₂ : EuclidPoint) :
---   p₁.dot p₂ = p₁.x * p₂.x + p₁.y * p₂.y := rfl
 
 @[euclid_simp]
 def Segment.dot (seg₁ seg₂ : Segment) : ℝ :=
@@ -343,13 +335,20 @@ notation p " ∈ " l => Line.containsSegment p l
 -- Circle definition
 structure EuclidCircle where
   center : EuclidPoint
-  sq_radius : ℝ
+  borderPoint : EuclidPoint
 
 -- Circle containment
+@[euclid_simp]
 def EuclidCircle.containsPoint (c : EuclidCircle) (p : EuclidPoint) : Prop :=
-  (p.x - c.center.x)^2 + (p.y - c.center.y)^2 = c.sq_radius
+  |p - c.center|^2 = |c.borderPoint - c.center|^2
 
 notation p " ∈ " c => EuclidCircle.containsPoint c p
+
+--**Delete**
+@[euclid_simp]
+lemma sq_length_def {A B : EuclidPoint} :
+  |A - B|^2 = (A.x - B.x)^2 + (A.y - B.y)^2 := by
+  rw [Segment.length_sq_eq]
 
 -- Rule for ∨
 @[euclid_simp]
@@ -373,10 +372,10 @@ def Col (p₁ p₂ p₃ : EuclidPoint) : Prop :=
   (p₂.y - p₁.y) * (p₃.x - p₁.x) = 0
 
 -- Noncollinearity
-@[euclid_simp]
-def Noncol (p₁ p₂ p₃ : EuclidPoint) : Prop := ∃ t,
-  t * ((p₂.x - p₁.x) * (p₃.y - p₁.y) -
-  (p₂.y - p₁.y) * (p₃.x - p₁.x)) = 1
+-- @[euclid_simp]
+-- def Noncol (p₁ p₂ p₃ : EuclidPoint) : Prop := ∃ t,
+--   t * ((p₂.x - p₁.x) * (p₃.y - p₁.y) -
+--   (p₂.y - p₁.y) * (p₃.x - p₁.x)) = 1
 
 -- Betweenness
 @[euclid_simp]
@@ -386,9 +385,13 @@ def Between (p₁ p₂ p₃ : EuclidPoint) : Prop :=
 -- Area
 @[euclid_simp]
 noncomputable
-def Area (p₁ p₂ p₃ : EuclidPoint) : ℝ :=
+def AreaT (p₁ p₂ p₃ : EuclidPoint) : ℝ :=
   2⁻¹ * ((p₂.x - p₁.x) * (p₃.y - p₁.y) -
   (p₂.y - p₁.y) * (p₃.x - p₁.x))
+
+@[euclid_simp]
+def AreaP (p₁ p₂ p₃ : EuclidPoint) : ℝ :=
+  (p₂.x - p₁.x) * (p₃.y - p₁.y) - (p₂.y - p₁.y) * (p₃.x - p₁.x)
 
 -- Strong parallelism
 @[euclid_simp]
@@ -397,3 +400,75 @@ def StrongParallel (seg₁ seg₂ : Segment) : Prop :=
   (seg₁.endpoint.y - seg₁.start.y) * (seg₂.endpoint.y - seg₂.start.y) = |seg₁| * |seg₂|
 
 notation seg₁ " ||| " seg₂ => StrongParallel seg₁ seg₂
+
+@[euclid_simp]
+noncomputable
+def isMidpoint (A : EuclidPoint) (seg : Segment) : Prop :=
+  2 * A.x = (seg.start.x + seg.endpoint.x) ∧ 2 * A.y = (seg.start.y + seg.endpoint.y)
+
+@[euclid_simp]
+def isCircumcenter (O A B C : EuclidPoint) : Prop :=
+  |O - A|^2 = |O - B|^2 ∧ |O - A|^2 = |O - C|^2
+
+@[euclid_simp]
+def Square (A B C D : EuclidPoint) : Prop :=
+  B.x = (D.y - A.y) + A.x ∧
+  B.y = -(D.x - A.x) + A.y ∧
+  C.x = (D.x - A.x) + B.x ∧
+  C.y = (D.y - A.y) + B.y
+
+@[euclid_simp]
+def Parallelogram (A B C D : EuclidPoint) : Prop :=
+  C.x = (D.x - A.x) + B.x ∧
+  C.y = (D.y - A.y) + B.y
+
+@[euclid_simp]
+def Concyclic (A B C D : EuclidPoint) : Prop :=
+  let det := (A.x^2 + A.y^2) * (B.x * (C.y - D.y) + C.x * (D.y - B.y) + D.x * (B.y - C.y)) +
+             (B.x^2 + B.y^2) * (C.x * (D.y - A.y) + D.x * (A.y - C.y) + A.x * (C.y - D.y)) +
+             (C.x^2 + C.y^2) * (D.x * (A.y - B.y) + A.x * (B.y - D.y) + B.x * (D.y - A.y)) +
+             (D.x^2 + D.y^2) * (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y))
+  det = 0
+
+@[euclid_simp]
+def isOrthocenter (H A B C : EuclidPoint) : Prop :=
+  ((H - A) ⊥ (B - C)) ∧ ((H - B) ⊥ (A - C)) ∧ ((H - C) ⊥ (A - B))
+
+lemma EuclidPoint.pointEq (A B : EuclidPoint) : A = B ↔ |A - B| = 0 := by
+  constructor
+  · intro h
+    rw [h]
+    rw [Segment.length_eq_zero_iff]
+    simp [euclid_simp]
+  · intro h
+    -- From |A - B| = 0, we get |A - B|^2 = 0
+    rw [Segment.length_eq_zero_iff] at h
+    rw [Segment.length_sq_eq] at h
+    -- Now h : (A.x - B.x)^2 + (A.y - B.y)^2 = 0
+
+    -- Since squares are non-negative and sum to zero, each must be zero
+    have hx_sq : (A.x - B.x)^2 = 0 := by
+      -- Both squares are non-negative
+      have h1 : 0 ≤ (A.x - B.x)^2 := sq_nonneg _
+      have h2 : 0 ≤ (A.y - B.y)^2 := sq_nonneg _
+      -- If their sum is zero, the first must be zero
+      linarith
+
+    have hy_sq : (A.y - B.y)^2 = 0 := by
+      have h1 : 0 ≤ (A.x - B.x)^2 := sq_nonneg _
+      have h2 : 0 ≤ (A.y - B.y)^2 := sq_nonneg _
+      linarith
+
+    -- From (a - b)^2 = 0, we get a - b = 0, hence a = b
+    have hx : A.x = B.x := by
+      rw [sq_eq_zero_iff] at hx_sq
+      linarith
+
+    have hy : A.y = B.y := by
+      rw [sq_eq_zero_iff] at hy_sq
+      linarith
+
+    -- Use point extensionality
+    ext
+    · exact hx
+    · exact hy
