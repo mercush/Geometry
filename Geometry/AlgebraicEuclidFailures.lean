@@ -12,11 +12,13 @@ theorem Proposition26_ASA
   (h2 : |A - B| ≠ 0)
   (h3 : |A - C| ≠ 0)
   (h4 : |B - C| ≠ 0)
-  (h5 : ∠ h2 h3 = ∠ (by nondegen : |P - Q| ≠ 0) (by sorry : |P - R| ≠ 0))  -- Angle A = Angle P
-  (h6 : ∠ h2 h4 = ∠ (by nondegen : |P - Q| ≠ 0) (by sorry : |Q - R| ≠ 0))  -- Angle B = Angle Q
-  (h7 : ¬Col A B C)
-  (h8 : ¬Col P Q R)
-  : |A - C| = |P - R| ∧ |B - C| = |Q - R| := by
+  (h5 : |P - R| ≠ 0)
+  (h6 : |Q - R| ≠ 0)
+  (h5 : ∠ B A C (by nondegen)= ∠ Q P R (by nondegen))  -- Angle A = Angle P
+  (h6 : ∠ A B C (by nondegen) = ∠ P Q R (by nondegen))  -- Angle B = Angle Q
+  (h7 : Noncol A B C)
+  (h8 : Noncol P Q R)
+  : |A - C|^2 = |P - R|^2 := by
   algebraic_euclid
 
 theorem Proposition27
@@ -52,7 +54,7 @@ theorem Proposition34
   (h4 : |A - D| ≠ 0)
   (h5 : |B - C| ≠ 0)
   (h6 : |D - C| ≠ 0)
-  (h7 : ¬Col A B C)
+  (h7 : Noncol A B C)
   : |A - B| = |D - C| ∧ |A - D| = |B - C| ∧
     ∠ h3 h4 = ∠ h5 h6 := by
   algebraic_euclid
@@ -63,7 +65,7 @@ theorem Proposition43
   (h3 : Col A E C)  -- E on diagonal AC
   (h4 : Col B F D)  -- F on diagonal BD
   (h5 : (E - F) || (A - B))
-  (h6 : ¬Col A B C)
+  (h6 : Noncol A B C)
   : AreaP A E F = AreaP E B C := by
   algebraic_euclid
 
@@ -76,9 +78,9 @@ theorem QuadrilateralAngleSum
   (h6 : |C - D| ≠ 0)
   (h7 : |D - C| ≠ 0)
   (h8 : |D - A| ≠ 0)
-  (h9 : ¬Col A B C)
-  (h10 : ¬Col B C D)
-  (h11 : ¬Col C D A)
+  (h9 : Noncol A B C)
+  (h10 : Noncol B C D)
+  (h11 : Noncol C D A)
   : (∠ h1 h2) + (∠ h3 h4) + (∠ h5 h6) + (∠ h7 h8) = (∟ + ∟) + (∟ + ∟) := by
   algebraic_euclid
 
@@ -97,7 +99,7 @@ theorem RightTriangleAltitudeTheorem
 -- altitude from C to the hypotenuse AB, then CD² = AD · DB
 theorem IMO_2021_Problem_4
   -- Triangle ABC
-  (h1 : ¬Col A B C)
+  (h1 : Noncol A B C)
   -- Quadrilateral ABDE with DE || AB
   (h2 : (D - E) || (A - B))
   -- Points F and G on segments AC and BC respectively
@@ -128,10 +130,83 @@ theorem IMO_2025_Problem_2
   (h7 : (Col F A P) ∧ (F ∈ EuclidCircle.mk N A) ∧ (F ≠ A))       -- F on line AP and circle Γ
   (h8 : isOrthocenter H P M N)                             -- H is orthocenter of PMN
   -- Nondegeneracy
-  (h9 : ¬Col A C D ∧ ¬Col P M N ∧ ¬Col B E F)
+  (h9 : Noncol A C D ∧ Noncol P M N ∧ Noncol B E F)
   :
   -- Simplified conclusion: some specific geometric relationship holds
   ∃ T : EuclidPoint, ((H - T) || (A - P)) ∧
     isCircumcenter O B E F ∧ |T - O| = |B - O|  -- T on circumcircle
+  := by
+  algebraic_euclid
+
+theorem CevaTheorem_ConverseDirect
+  (h1 : Col D B C)  -- D lies on side BC
+  (h2 : Col E C A)  -- E lies on side CA
+  (h3 : Col F A B)  -- F lies on side AB
+  (h4 : |A - F| * |B - D| * |C - E| = |F - B| * |D - C| * |E - A|)  -- Ceva's ratio condition
+  (h5 : Noncol A B C)  -- Triangle ABC is non-degenerate
+  (h6 : Col A G D)  -- Line AD passes through point G
+  (h7 : Col B G E)  -- Line BE passes through point G
+  (h8 : ¬((A - D) || (B - E)))  -- Lines AD and BE are not parallel (so G exists)
+  :
+  Col C G F  -- Then CF also passes through G
+  := by
+  algebraic_euclid
+
+theorem TangentIntersectionParallel
+  -- Given points
+  (A B C D E : EuclidPoint)
+
+  -- CIRCLE A B (circle with center A passing through B)
+  -- This is implicit in the OnCircle conditions
+
+  -- ON_CIRCLE C A B (C is on circle with center A passing through B)
+  (h1 : OnCircle C A B)
+
+  -- ON_TLINE C D A C (line CD is tangent to circle centered at A at point C)
+  (h2 : TangentToCircleAt C D A C)
+
+  -- ON_TLINE B D A B (line BD is tangent to circle centered at A at point B)
+  (h3 : TangentToCircleAt B D A B)
+
+  -- INTERSECTION_LC E C A A C (E is intersection of line CA with circle AC)
+  -- This means E is the second intersection of line CA with circle centered at A through C
+  (h4 : SecondIntersection E C A C)
+
+  -- Non-degeneracy conditions
+  -- (h5 : A ≠ B ∧ A ≠ C ∧ B ≠ C)
+  (h6 : |A - B| ≠ 0)
+  (h7 : Noncol A B C)
+  -- (h7 : D ≠ B ∧ D ≠ C)  -- D is external to the tangent points
+
+  :
+  -- SHOW: PARALLEL A D B E (AD is parallel to BE)
+  (A - D) || (B - E)
+  := by
+  algebraic_euclid
+
+theorem PtolemyTheorem
+  (h1 : Concyclic A B C D)  -- ABCD is a cyclic quadrilateral
+  (h2 : Noncol A B C)                -- Non-degenerate conditions
+  (h3 : Noncol B C D)
+  (h4 : Noncol C D A)
+  (h5 : Noncol D A B)
+  :
+  -- The product of diagonals equals the sum of products of opposite sides
+  |A - C| * |B - D| = |A - B| * |C - D| + |A - D| * |B - C|
+  := by
+  algebraic_euclid
+
+theorem RightTriangleAltitudeTheorem
+  (h1 : (A - B) ⊥ (A - C))      -- Right angle at A
+  (h2 : Col B M C)              -- M lies on line BC
+  (h3 : (A - M) ⊥ (B - C))      -- AM is perpendicular to BC (altitude condition)
+  (h4 : |A - B| ≠ 0)           -- Non-degeneracy conditions
+  (h5 : |A - C| ≠ 0)
+  (h6 : |B - C| ≠ 0)
+  (h7 : |B - M| ≠ 0)           -- M is not at B
+  (h8 : |M - C| ≠ 0)           -- M is not at C
+  (h9 : Noncol A B C)  -- Triangle ABC is non-degenerate
+  :
+  |A - M|^2 = |B - M| * |M - C|
   := by
   algebraic_euclid

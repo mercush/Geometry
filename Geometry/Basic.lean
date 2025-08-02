@@ -12,8 +12,8 @@ theorem Proposition4
   (h2 : |A - C| = |P - R|)
   (nondegen1 : |A - B| ≠ 0)
   (nondegen2 : |A - C| ≠ 0)
-  (h3 : ∠ nondegen1 nondegen2 =
-  ∠ (by nondegen : |P - Q| ≠ 0) (by nondegen : |P - R| ≠ 0))
+  (h3 : ∠ B A C (by nondegen) =
+  ∠ Q P R (by nondegen))
   :
   |B - C| = |Q - R|
   := by
@@ -24,7 +24,7 @@ theorem Proposition5
   (nondegen1 : |B - A| ≠ 0)
   (nondegen2 : |B - C| ≠ 0)
   (nondegen3 : |C - A| ≠ 0):
-  ∠ nondegen1 nondegen2 = ∠ (by nondegen : |C - B| ≠ 0) nondegen3
+  ∠ A B C (by nondegen) = ∠ B C A (by nondegen)
   := by
   algebraic_euclid
 
@@ -32,8 +32,8 @@ theorem Proposition6
   (h1 : |B - A| ≠ 0)
   (h2 : |B - C| ≠ 0)
   (h3 : |C - A| ≠ 0)
-  (h4 : ∠ h1 h2 = ∠ (by nondegen : |C - B| ≠ 0) h3)
-  (nondegen1 : ¬Col A B C)
+  (h4 : ∠ A B C (by nondegen) = ∠ B C A (by nondegen))
+  (nondegen1 : Noncol A B C)
   : |A - B| = |A - C| := by
   algebraic_euclid
 
@@ -51,10 +51,7 @@ theorem Proposition8
   (h3 : |A - C| = |P - R|)
   (nondegen1 : |A - B| ≠ 0)
   (nondegen2 : |C - A| ≠ 0) :
-  WeakAngleEq (∠ nondegen1 (by nondegen : |A - C| ≠ 0))
-  (∠ (by nondegen : |P - Q| ≠ 0)
-  (by nondegen : |P - R| ≠ 0))
-  := by
+  WeakAngleEq (∠ B A C (by nondegen)) (∠ Q P R (by nondegen)) := by
   algebraic_euclid
 
 theorem Proposition10
@@ -67,20 +64,20 @@ theorem Proposition13
   (h2 : |D - B| ≠ 0)
   (h3 : |D - C| ≠ 0)
   (h4 : Between A D B)
-  : ((∠ h1 h3) + (∠ h3 h2)) = (∟ + ∟)
+  : ((∠ A D C (by nondegen)) + (∠ C D B (by nondegen))) = (∟ + ∟)
   := by
   algebraic_euclid
 
 theorem Proposition15
   (h1 : Col A C B)
   (h2 : Col D C E)
-  (h3 : |A - C| ≠ 0)
+  (h3 : |C - A| ≠ 0)
   (h4 : |C - B| ≠ 0)
-  (h5 : |D - C| ≠ 0)
+  (h5 : |C - D| ≠ 0)
   (h6 : |C - E| ≠ 0)
   (h7 : Between A C B)
   (h8 : Between D C E)
-  : ∠ h3 h5 = ∠ h4 h6 := by
+  : ∠ A C D (by nondegen) = ∠ B C E (by nondegen) := by
   algebraic_euclid
 
 theorem Proposition30
@@ -95,14 +92,14 @@ theorem Proposition32
   (nondegen2 : |A - C| ≠ 0)
   (nondegen3 : |B - C| ≠ 0)
   :
-  (∠ nondegen1 nondegen2 + ∠ nondegen3 (by nondegen : |B - A| ≠ 0) +
-  ∠ (by nondegen : |C - A| ≠ 0) (by nondegen : |C - B| ≠ 0)) = (∟ + ∟) := by
+  (∠ B A C (by nondegen) + ∠ C B A (by nondegen) +
+  ∠ A C B (by nondegen)) = (∟ + ∟) := by
   algebraic_euclid
 
 theorem Proposition33
   (h1 : (A - B) || (C - D))
   (h2 : (A - C) || (B - D))
-  (nondegen1 : ¬Col A B C)
+  (nondegen1 : Noncol A B C)
   : |A - C| = |B - D| := by
   algebraic_euclid
 
@@ -173,7 +170,7 @@ theorem gex_GDD_FULL_more_E006_1
   (h8 : Col G A C)
   (h9 : Col H A C)
   (h10 : Col H B E)
-  (h12 : ¬Col A B C)
+  (h12 : Noncol A B C)
   : |G - A| = |G - H| := by
   algebraic_euclid
 
@@ -189,7 +186,7 @@ theorem PerpendicularBisectorsConcurrent
   (h3 : isMidpoint R (A - C))
   (h4 : (O - P) ⊥ (A - B))
   (h5 : (O - Q) ⊥ (B - C))
-  (h6 : ¬Col A B C)
+  (h6 : Noncol A B C)
   : (O - R) ⊥ (A - C) := by
   algebraic_euclid
 
@@ -199,15 +196,15 @@ theorem AngleBisectorTheorem
   (h3 : |A - B| ≠ 0)
   (h4 : |A - D| ≠ 0)
   (h5 : |A - C| ≠ 0)
-  (h8 : ∠ h3 h4 = ∠ h4 h5)
-  (h9 : ¬Col A B C)
+  (h8 : ∠ B A D (by nondegen) = ∠ D A C (by nondegen))
+  (h9 : Noncol A B C)
   : |B - D| * |A - C| = |D - C| * |A - B| := by
   algebraic_euclid
 
 theorem ParallelogramOppositeSidesEqual
   (h1 : (A - B) || (D - C))
   (h2 : (A - D) || (B - C))
-  (h3 : ¬Col A B C)
+  (h3 : Noncol A B C)
   : |A - B| = |D - C| ∧ |A - D| = |B - C| := by
   algebraic_euclid
 
@@ -215,14 +212,14 @@ theorem ParallelogramDiagonalsBisect
   (h1 : (A - B) || (D - C))
   (h2 : (A - D) || (B - C))
   (h3 : isMidpoint M (A - C))
-  (h4 : ¬Col A B D)
+  (h4 : Noncol A B D)
   : isMidpoint M (B - D) := by
   algebraic_euclid
 
 theorem ParallelogramLaw
   (h1 : (A - B) || (D - C))
   (h2 : (A - D) || (B - C))
-  (h3 : ¬Col A B D)
+  (h3 : Noncol A B D)
   : |A - B|^2 + |B - C|^2 + |C - D|^2 + |D - A|^2 = |A - C|^2 + |B - D|^2 := by
   algebraic_euclid
 
@@ -246,8 +243,6 @@ theorem gex_GDD_FULL_01_20_01
   (h6 : isMidpoint G (D - E))
   (h7 : |C - A| ≠ 0) :
   (F - G) ⊥ (D - E) := by
-  simp_all only [euclid_simp]
-  simp_all
   algebraic_euclid
 
 theorem gex_1_TOP_TEN_07_2altitude
@@ -275,7 +270,7 @@ theorem gex_GDD_FULL_more_E015_6
   (h3 : isMidpoint F (C - B))
   (h4 : (G - D) || (F - A))
   (h5 : (G - F) || (C - A))
-  (h6 : ¬Col A B C) :
+  (h6 : Noncol A B C) :
   -- Conclusion: CE parallel to GB
   (C - E) || (G - B) := by
   algebraic_euclid
@@ -287,7 +282,7 @@ theorem gex_Other_ndgs_02
   (h4 : (C - E) ⊥ (A - B))
   (h5 : Col F B D)
   (h6 : Col F C E)
-  (h7 : ¬Col A B C) :
+  (h7 : Noncol A B C) :
   (B - C) ⊥ (A - F) := by
   algebraic_euclid
 
@@ -327,5 +322,93 @@ theorem MidpointTheorem
   (h1 : isMidpoint D (A - B))
   (h2 : isMidpoint E (A - C)) :
   ((D - E) || (B - C)) ∧ 4 * |D - E|^2 = |B - C|^2
+  := by
+  algebraic_euclid
+
+theorem CevaTheorem
+  (h1 : Col D B C)  -- D lies on side BC
+  (h2 : Col E C A)  -- E lies on side CA
+  (h3 : Col F A B)  -- F lies on side AB
+  (h4 : Col A G D)  -- Line AD passes through point G
+  (h5 : Col B G E)  -- Line BE passes through point G
+  (h6 : Col C G F)  -- Line CF passes through point G
+  (h7 : Noncol A B C)  -- Triangle ABC is non-degenerate
+  :
+  |A - F|^2 * |B - D|^ 2 * |C - E| ^ 2 = |F - B| ^ 2 * |D - C| ^ 2 * |E - A| ^ 2
+  := by
+  algebraic_euclid
+
+theorem MenelausTheorem
+  (h1 : Col D B C)  -- D lies on side BC (or its extension)
+  (h2 : Col E C A)  -- E lies on side CA (or its extension)
+  (h3 : Col F A B)  -- F lies on side AB (or its extension)
+  (h4 : Col D E F)  -- The three points D, E, F are collinear
+  (h5 : Noncol A B C)  -- Triangle ABC is non-degenerate
+  :
+  |A - F|^2 * |B - D|^2 * |C - E|^2 = |F - B|^2 * |D - C|^2 * |E - A|^2
+  := by
+  algebraic_euclid
+
+theorem VarignonTheorem
+  (h1 : isMidpoint E (A - B))  -- E is midpoint of AB
+  (h2 : isMidpoint F (B - C))  -- F is midpoint of BC
+  (h3 : isMidpoint G (C - D))  -- G is midpoint of CD
+  (h4 : isMidpoint H (D - A))  -- H is midpoint of DA
+  :
+  ((E - F) || (H - G)) ∧ (F - G) || (E - H)
+  := by
+  algebraic_euclid
+
+theorem BritishFlagTheorem
+  -- Rectangle ABCD with point P
+  (A B C D P : EuclidPoint)
+  -- ABCD is a rectangle
+  (h1 : IsRectangle A B C D)
+  -- Non-degeneracy
+  (h2 : Noncol A B C ∧ Noncol B C D)
+  :
+  -- Sum of squares to opposite corners are equal
+  |A - P|^2 + |C - P|^2 = |B - P|^2 + |D - P|^2
+  := by
+  algebraic_euclid
+
+theorem HeronsTheorem :
+  let a := |B - C|
+  let b := |C - A|
+  let c := |A - B|
+  let s := (a + b + c) / 2
+  (AreaT A B C)^2 = s * (s - a) * (s - b) * (s - c)
+  := by
+  algebraic_euclid
+
+theorem MedianToHypotenuseTheorem
+  (h1 : (A - B) ⊥ (A - C))      -- Right angle at A
+  (h2 : isMidpoint M (B - C))   -- M is midpoint of hypotenuse BC
+  (h3 : |A - B| ≠ 0)           -- Non-degeneracy conditions
+  (h4 : |A - C| ≠ 0)
+  :
+  4 * |A - M|^2 = |B - C|^2
+  := by
+  algebraic_euclid
+
+theorem IntersectingChordsTheorem
+  (h1 : |O - A| = |O - B|)      -- A and B are on the same circle centered at O
+  (h2 : |O - B| = |O - C|)      -- C is also on the circle
+  (h3 : |O - C| = |O - D|)      -- D is also on the circle
+  (h6 : Between A P B)          -- P is between A and B (chord AB passes through P)
+  (h7 : Between C P D)          -- P is between C and D (chord CD passes through P)
+  (h9 : |C - D| ≠ 0)
+  (h12 : |C - P| ≠ 0)
+  :
+  |A - P| * |P - B| = |C - P| * |P - D|
+  := by
+  algebraic_euclid
+
+theorem TriangleHeightAreaTheorem
+  (h1 : Col B H C)              -- H lies on line BC (foot of altitude)
+  (h2 : (A - H) ⊥ (B - C))      -- AH is perpendicular to BC (altitude)
+  (h5 : Noncol A B C)          -- Triangle is non-degenerate
+  :
+  4 * (AreaT A B C)^2 = |B - C|^2 * |A - H|^2
   := by
   algebraic_euclid

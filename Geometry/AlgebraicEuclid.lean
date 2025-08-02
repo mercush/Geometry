@@ -183,29 +183,45 @@ instance Angle.instSetoid : Setoid Angle' where
 
 def Angle := Quotient Angle.instSetoid
 
+-- noncomputable
+-- def Angle.mk {x₁ x₂ x₄ : EuclidPoint}
+--   (h₁ : |x₁ - x₂| ≠ 0)
+--   (h₂ : |x₁ - x₄| ≠ 0)
+--   : Angle :=
+--   Quotient.mk'
+--   (Angle'.mk
+--   ((x₂.x - x₁.x) * (x₄.x - x₁.x) + (x₂.y - x₁.y) * (x₄.y - x₁.y))
+--   ((x₂.x - x₁.x) * (x₄.y - x₁.y) - (x₂.y - x₁.y) * (x₄.x - x₁.x))
+--   (|x₁ - x₂| * |x₁ - x₄|)
+--   (by grind))
+
 noncomputable
-def Angle.mk {x₁ x₂ x₃ x₄ : EuclidPoint}
-  (h₁ : |x₁ - x₂| ≠ 0)
-  (h₂ : |x₃ - x₄| ≠ 0)
-  : Angle :=
+def Angle.mk (x₂ x₁ x₄ : EuclidPoint) (h : |x₁ - x₂| ≠ 0 ∧ |x₁ - x₄| ≠ 0) : Angle :=
   Quotient.mk'
   (Angle'.mk
-  ((x₂.x - x₁.x) * (x₄.x - x₃.x) + (x₂.y - x₁.y) * (x₄.y - x₃.y))
-  ((x₂.x - x₁.x) * (x₄.y - x₃.y) - (x₂.y - x₁.y) * (x₄.x - x₃.x))
-  (|x₁ - x₂| * |x₃ - x₄|)
-  (by aesop))
+  ((x₂.x - x₁.x) * (x₄.x - x₁.x) + (x₂.y - x₁.y) * (x₄.y - x₁.y))
+  ((x₂.x - x₁.x) * (x₄.y - x₁.y) - (x₂.y - x₁.y) * (x₄.x - x₁.x))
+  (|x₁ - x₂| * |x₁ - x₄|)
+  (by grind))
 
 notation "∠" => Angle.mk
 
 def Angle.mk' (cos sin norm : ℝ) (h : norm ≠ 0) : Angle :=
   Quotient.mk' (Angle'.mk cos sin norm h)
 
+-- @[euclid_simp]
+-- lemma Angle.coordToTrig {x₁ x₂ x₄ : EuclidPoint}
+--   {h₁ : |x₁ - x₂| ≠ 0} {h₂ : |x₁ - x₄| ≠ 0} :
+--   Angle.mk h₁ h₂ = Angle.mk' ((x₂.x - x₁.x) * (x₄.x - x₁.x) + (x₂.y - x₁.y) * (x₄.y - x₁.y))
+--     ((x₂.x - x₁.x) * (x₄.y - x₁.y) - (x₂.y - x₁.y) * (x₄.x - x₁.x))
+--     (|x₁ - x₂| * |x₁ - x₄|) (by aesop) := rfl
+
 @[euclid_simp]
-lemma Angle.coordToTrig {x₁ x₂ x₃ x₄ : EuclidPoint}
-  {h₁ : |x₁ - x₂| ≠ 0} {h₂ : |x₃ - x₄| ≠ 0} :
-  Angle.mk h₁ h₂ = Angle.mk' ((x₂.x - x₁.x) * (x₄.x - x₃.x) + (x₂.y - x₁.y) * (x₄.y - x₃.y))
-    ((x₂.x - x₁.x) * (x₄.y - x₃.y) - (x₂.y - x₁.y) * (x₄.x - x₃.x))
-    (|x₁ - x₂| * |x₃ - x₄|) (by aesop) := rfl
+lemma Angle.coordToTrig {x₁ x₂ x₄ : EuclidPoint}
+  {h₁ : |x₁ - x₂| ≠ 0 ∧ |x₁ - x₄| ≠ 0} :
+  Angle.mk x₂ x₁ x₄ h₁ = Angle.mk' ((x₂.x - x₁.x) * (x₄.x - x₁.x) + (x₂.y - x₁.y) * (x₄.y - x₁.y))
+    ((x₂.x - x₁.x) * (x₄.y - x₁.y) - (x₂.y - x₁.y) * (x₄.x - x₁.x))
+    (|x₁ - x₂| * |x₁ - x₄|) (by aesop) := rfl
 
 @[euclid_simp]
 lemma Angle.eq' {cos₁ sin₁ norm₁ : ℝ} {nonzero₁ : norm₁ ≠ 0}
@@ -472,3 +488,63 @@ lemma EuclidPoint.pointEq (A B : EuclidPoint) : A = B ↔ |A - B| = 0 := by
     ext
     · exact hx
     · exact hy
+
+@[euclid_simp]
+def Noncol (A B C : EuclidPoint) : Prop := ¬Col A B C
+
+@[euclid_simp]
+def IsEquilateral (A B C : EuclidPoint) : Prop :=
+  |A - B| = |B - C| ∧ |B - C| = |C - A|
+
+/-
+PROBLEM:
+1. Conclusions shouldn't involve unsquared lengths.
+2. Also, if there is a (|A - B| * |C - D|)^2 then this has to get distributed. -/
+
+-- Helper: Point lies on circumcircle of triangle
+@[euclid_simp]
+def OnCircumcircle (P A B C : EuclidPoint) : Prop :=
+  |P - A|^2 + |P - B|^2 + |P - C|^2 + |A - B|^2 + |B - C|^2 + |C - A|^2 =
+  2 * (|P - A|^2 + |P - B|^2 + |P - C|^2)  -- Equivalent circumcircle condition
+
+
+-- New predicates for circle and tangent geometry
+
+-- Point lies on circle with center O passing through P
+@[euclid_simp]
+def OnCircle (X O P : EuclidPoint) : Prop :=
+  |X - O| = |P - O|
+
+-- Line through points P and Q is tangent to circle with center O at point T
+@[euclid_simp]
+def TangentToCircleAt (P Q O T : EuclidPoint) : Prop :=
+  OnCircle T O T ∧  -- T is on the circle (trivially true but for clarity)
+  Col P T Q ∧       -- P, T, Q are collinear (T is on line PQ)
+  (O - T) ⊥ (P - Q) -- Radius OT is perpendicular to tangent line PQ
+
+-- Point X lies on line that is tangent to circle with center O at point T
+@[euclid_simp]
+def OnTangentLine (X T O : EuclidPoint) : Prop :=
+  ∃ Y, Y ≠ X ∧ TangentToCircleAt X Y O T
+
+-- Intersection of line through P and Q with circle centered at O passing through R
+@[euclid_simp]
+def IntersectionLineCircle (H P Q O R : EuclidPoint) : Prop :=
+  Col H P Q ∧ OnCircle H O R
+
+-- Intersection of line with circle (second intersection point)
+def IntersectionLineCircleSecond (E P Q O R : EuclidPoint) : Prop :=
+  Col E P Q ∧                    -- E lies on line PQ
+  OnCircle E O R ∧               -- E lies on circle centered at O passing through R
+  E ≠ P ∧ E ≠ Q                  -- E is distinct from P and Q (second intersection)
+
+-- Alternative: E is the "other" intersection point
+@[euclid_simp]
+def SecondIntersection (E P O R : EuclidPoint) : Prop :=
+  Col E P O ∧                    -- E lies on line through P and center O
+  OnCircle E O R ∧               -- E lies on circle centered at O passing through R
+  E ≠ P                          -- E is different from P (the "other" intersection)
+
+@[euclid_simp]
+def IsRectangle (A B C D : EuclidPoint) : Prop :=
+  ((A - B) ⊥ (B - C)) ∧ ((B - C) ⊥ (C - D)) ∧ ((C - D) ⊥ (D - A)) ∧ (D - A) ⊥ (A - B)

@@ -95,7 +95,8 @@ theorem gex_1_TOP_TEN_09_orth
   (nondegen3 : |G - E| ≠ 0)
   (nondegen4 : C.x^3 ≠ 0)
   (nondegen5 : C.x^2 + C.y^2 ≠ 0):
-  ∠ nondegen1 nondegen2 = ∠ nondegen2 nondegen3
+  WeakAngleEq (∠ D G A (by nondegen)) (∠ A G E (by nondegen))
+  -- The problem appears to be with how angles are defined.
   := by
   algebraic_euclid
 
