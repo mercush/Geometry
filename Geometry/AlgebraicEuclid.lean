@@ -1,5 +1,6 @@
 -- Minimal required imports
-import Mathlib
+import Mathlib.Algebra.CharP.Basic
+import Mathlib.Analysis.RCLike.Basic
 
 import Geometry.Simp
 

@@ -196,7 +196,7 @@ theorem PtolemyTheorem
   := by
   algebraic_euclid
 
-theorem RightTriangleAltitudeTheorem
+theorem RightTriangleAltitudeTheorem'
   (h1 : (A - B) ⊥ (A - C))      -- Right angle at A
   (h2 : Col B M C)              -- M lies on line BC
   (h3 : (A - M) ⊥ (B - C))      -- AM is perpendicular to BC (altitude condition)
