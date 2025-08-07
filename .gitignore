@@ -1,3 +1,4 @@
 /.lake
 Alpha.lean
 Beta.lean
+.env

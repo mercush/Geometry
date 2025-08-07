@@ -1,7 +1,5 @@
--- Minimal required imports
 import Mathlib.Algebra.CharP.Basic
 import Mathlib.Analysis.RCLike.Basic
-
 import Geometry.Simp
 
 structure EuclidPoint where
@@ -440,14 +438,6 @@ def Parallelogram (A B C D : EuclidPoint) : Prop :=
   C.y = (D.y - A.y) + B.y
 
 @[euclid_simp]
-def Concyclic (A B C D : EuclidPoint) : Prop :=
-  let det := (A.x^2 + A.y^2) * (B.x * (C.y - D.y) + C.x * (D.y - B.y) + D.x * (B.y - C.y)) +
-             (B.x^2 + B.y^2) * (C.x * (D.y - A.y) + D.x * (A.y - C.y) + A.x * (C.y - D.y)) +
-             (C.x^2 + C.y^2) * (D.x * (A.y - B.y) + A.x * (B.y - D.y) + B.x * (D.y - A.y)) +
-             (D.x^2 + D.y^2) * (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y))
-  det = 0
-
-@[euclid_simp]
 def isOrthocenter (H A B C : EuclidPoint) : Prop :=
   ((H - A) ⊥ (B - C)) ∧ ((H - B) ⊥ (A - C)) ∧ ((H - C) ⊥ (A - B))
 
@@ -549,3 +539,22 @@ def SecondIntersection (E P O R : EuclidPoint) : Prop :=
 @[euclid_simp]
 def IsRectangle (A B C D : EuclidPoint) : Prop :=
   ((A - B) ⊥ (B - C)) ∧ ((B - C) ⊥ (C - D)) ∧ ((C - D) ⊥ (D - A)) ∧ (D - A) ⊥ (A - B)
+
+-- Incenter: center of inscribed circle
+@[euclid_simp]
+def isIncenter (I A B C : EuclidPoint) : Prop :=
+  ∃ (D E F : EuclidPoint),
+    Col D B C ∧ ((I - D) ⊥ (B - C)) ∧
+    Col E A C ∧ ((I - E) ⊥ (A - C)) ∧
+    Col F A B ∧ ((I - F) ⊥ (A - B)) ∧
+    |I - D| = |I - E| ∧ |I - E| = |I - F|
+
+-- Foot of perpendicular from P to line AB
+@[euclid_simp]
+def isFoot (F P A B : EuclidPoint) : Prop :=
+  Col F A B ∧ (P - F) ⊥ (A - B)
+
+-- Reflection of point P across line AB
+@[euclid_simp]
+def isReflection (P' P A B : EuclidPoint) : Prop :=
+  ∃ (M : EuclidPoint), isMidpoint M (P - P') ∧ ((P - P') ⊥ (A - B)) ∧ Col M A B

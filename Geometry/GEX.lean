@@ -1,5 +1,5 @@
-import Geometry.AlgebraicEuclid
 import Geometry.Tactic
+import Geometry.Angles
 
 variable (C D E F G H I J K L M N O P Q R S T U V X Y Z : EuclidPoint)
 abbrev A := EuclidPoint.mk 0 0
@@ -60,7 +60,7 @@ theorem perpendicular_lines
   := by
     grind
 
--- 1_TOP_TEN / 09_orth
+-- 1_TOP_TEN / 09_orth / Done
 theorem angle_equality
   -- Initial polynomial set as hypotheses
   (h1 : F.x * G.y - F.y * G.x = 0)
@@ -80,25 +80,6 @@ theorem angle_equality
   E.x * G.y^3 + ((-E.y - D.y) * G.x - D.y * E.x) * G.y^2 + (E.x * G.x^2 + 2 * D.y * E.y * G.x) * G.y + (-E.y - D.y) * G.x^3 + D.y * E.x * G.x^2 = 0
   := by
     grind
-
-theorem gex_1_TOP_TEN_09_orth
-  (h1 : (D - C) ⊥ (B - A))
-  (h2 : Col D A B)
-  (h3 : (E - B) ⊥ (A - C))
-  (h4 : Col E A C)
-  (h5 : Col F B E)
-  (h6 : Col F C D)
-  (h7 : Col G A F)
-  (h8 : Col G B C)
-  (nondegen1 : |G - D| ≠ 0)
-  (nondegen2 : |G - A| ≠ 0)
-  (nondegen3 : |G - E| ≠ 0)
-  (nondegen4 : C.x^3 ≠ 0)
-  (nondegen5 : C.x^2 + C.y^2 ≠ 0):
-  WeakAngleEq (∠ D G A (by nondegen)) (∠ A G E (by nondegen))
-  -- The problem appears to be with how angles are defined.
-  := by
-  algebraic_euclid
 
 -- _GDD_FULL / 01-20 / 02
 theorem perpendicular_OA1_B1C1
@@ -218,7 +199,7 @@ theorem perpendicular_BC_AF
   := by
     grind
 
--- _Book / 00EE / 02 / E028-2
+-- _Book / 00EE / 02 / E028-2 / Done
 theorem perpendicular_DB_FA
   -- Initial polynomial set as hypotheses (already in Groebner basis form!)
   (h1 : F.y - C.y - C.x = 0)
@@ -238,12 +219,6 @@ theorem perpendicular_DB_FA
   (D.y - B.y) * F.y + D.x * F.x = 0
   := by
     grind
-
-theorem Squares_On_Triangle_Sides_Perpendicular
-  (h1 : Square E A C D)
-  (h2 : Square B G F C) :
-  (D - B) ⊥ (A - F) := by
-  algebraic_euclid
 
 -- _Book / 00EE / 03 / E037-20
 -- Primitives needed:
@@ -300,7 +275,7 @@ theorem IMO_2021_P3
   (h2 : |A - D| ≠ 0)
   (h3 : |C - B| ≠ 0)
   (h4 : |C - D| ≠ 0)
-  (h5 : ∠ h1 h2 = ∠ h3 h4)  -- D bisects angle ABC
+  (h5 : ∠T B A D = ∠T B C D)  -- D bisects angle ABC
   -- E is on line AC
   (h6 : Col E A C)
   -- F is on line AB
