@@ -1,5 +1,6 @@
 import Geometry.Tactic
 import Geometry.Angles
+
 variable (C D E F G H I J K L
   M N O P Q R S T U V X Y Z : EuclidPoint)
 
@@ -274,24 +275,24 @@ theorem MidpointTheorem
   algebraic_euclid
 
 theorem CevaTheorem
-  (h1 : Col D B C)  -- D lies on side BC
-  (h2 : Col E C A)  -- E lies on side CA
-  (h3 : Col F A B)  -- F lies on side AB
-  (h4 : Col A G D)  -- Line AD passes through point G
-  (h5 : Col B G E)  -- Line BE passes through point G
-  (h6 : Col C G F)  -- Line CF passes through point G
-  (h7 : Noncol A B C)  -- Triangle ABC is non-degenerate
+  (h1 : Col D B C)
+  (h2 : Col E C A)
+  (h3 : Col F A B)
+  (h4 : Col A G D)
+  (h5 : Col B G E)
+  (h6 : Col C G F)
+  (h7 : Noncol A B C)
   :
   |A - F|^2 * |B - D|^ 2 * |C - E| ^ 2 = |F - B| ^ 2 * |D - C| ^ 2 * |E - A| ^ 2
   := by
   algebraic_euclid
 
 theorem MenelausTheorem
-  (h1 : Col D B C)  -- D lies on side BC (or its extension)
-  (h2 : Col E C A)  -- E lies on side CA (or its extension)
-  (h3 : Col F A B)  -- F lies on side AB (or its extension)
-  (h4 : Col D E F)  -- The three points D, E, F are collinear
-  (h5 : Noncol A B C)  -- Triangle ABC is non-degenerate
+  (h1 : Col D B C)
+  (h2 : Col E C A)
+  (h3 : Col F A B)
+  (h4 : Col D E F)
+  (h5 : Noncol A B C)
   :
   |A - F|^2 * |B - D|^2 * |C - E|^2 = |F - B|^2 * |D - C|^2 * |E - A|^2
   := by
@@ -320,7 +321,7 @@ theorem BritishFlagTheorem
   := by
   algebraic_euclid
 
-theorem HeronsTheorem:
+theorem HeronsTheorem :
   let a := |B - C|
   let b := |C - A|
   let c := |A - B|
@@ -352,10 +353,24 @@ theorem IntersectingChordsTheorem
   := by
   algebraic_euclid
 
+theorem CircleAngle
+  (h1 : |O - A| = |O - B|)
+  (h2 : |O - B| = |O - C|)
+  (h3 : |O - C| = |O - D|)
+  :
+  Concyclic A B D C
+  := by
+  algebraic_euclid
+
+theorem HalfAngle
+  (h1 : |O - A| = |O - B|)
+  (h2 : |O - B| = |O - C|) :
+  ∠T A C B + ∠T A C B = ∠T A O B := by algebraic_euclid
+
 theorem TriangleHeightAreaTheorem
-  (h1 : Col B H C)              -- H lies on line BC (foot of altitude)
-  (h2 : (A - H) ⊥ (B - C))      -- AH is perpendicular to BC (altitude)
-  (h5 : Noncol A B C)          -- Triangle is non-degenerate
+  (h1 : Col B H C)
+  (h2 : (A - H) ⊥ (B - C))
+  (h5 : Noncol A B C)
   :
   4 * (AreaT A B C)^2 = |B - C|^2 * |A - H|^2
   := by
@@ -380,3 +395,10 @@ theorem Squares_On_Triangle_Sides_Perpendicular
   (h2 : Square B G F C) :
   (D - B) ⊥ (A - F) := by
   algebraic_euclid
+
+theorem IsoscelesTriangleAltitudeMedian
+  (h1 : |A - B| = |A - C|)
+  (h2 : Col B D C)
+  (h3 : (A - D) ⊥ (B - C))
+  (h4 : Noncol A B C)
+  : isMidpoint D (B - C) := by algebraic_euclid

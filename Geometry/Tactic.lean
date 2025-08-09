@@ -10,10 +10,11 @@ macro "algebraic_euclid" : tactic =>
         | rw [EuclidPoint.pointEq]
         | constructor))
       <;>
-      (set_option trace.grind.ring.internalize true in
-       set_option trace.grind.debug.ring.basis true in
-       set_option trace.grind.ematch.instance true in
-       grind (splits := 0) -splitMatch -splitIte -splitIndPred -splitImp -linarith -cutsat (ringSteps := 10000000000000)) )
+      (
+      --  set_option trace.grind.ring.internalize true in
+      --  set_option trace.grind.debug.ring.basis true in
+      --  set_option trace.grind.ematch.instance true in
+       grind (splits := 0) -splitMatch -splitIte -splitIndPred -splitImp -linarith -cutsat (ringSteps := 1000000000000000)))
 
 
 macro "nondegen" : tactic =>

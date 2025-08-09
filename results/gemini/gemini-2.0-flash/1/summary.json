@@ -1,0 +1,10 @@
+{
+  "model_type": "gemini",
+  "model_name": "gemini-2.0-flash",
+  "k_examples": 1,
+  "n_trials": 1,
+  "results_summary": {
+    "Success": 1
+  },
+  "success_rate": 1.0
+}

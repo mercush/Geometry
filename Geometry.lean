@@ -1,2 +1,2 @@
-import Geometry.Basic
-import Geometry.AlgebraicEuclid
+import Geometry.Tactic
+import Geometry.Angles

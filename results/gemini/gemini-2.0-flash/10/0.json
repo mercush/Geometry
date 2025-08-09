@@ -1,0 +1,4 @@
+{
+  "conjecture": "theorem MidpointParallelogram\n  (h1 : Parallelogram A B C D)\n  (h2 : isMidpoint E (A - B))\n  (h3 : isMidpoint F (C - D))\n  (h4 : Noncol A B C)\n  : (E - F) || (A - D) := by algebraic_euclid\n",
+  "valid": true
+}

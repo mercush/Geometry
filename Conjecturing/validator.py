@@ -12,40 +12,61 @@ from google import genai
 from lean_interact import LeanREPLConfig, AutoLeanServer, Command, LocalProject
 from lean_interact.interface import LeanError, CommandResponse
 from LeanPotential import lean_parse
+from Geometry.Conjecturing.prompts import validator_system_prompt, validator_user_prompt
 
-TIMEOUT = 20
+TIMEOUT = 60
 
 class Validator:
-    def __init__(self, lean_version, project_dir, lean_preamble):
-        self.lean_config = LeanREPLConfig(verbose=True, project=LocalProject(directory=project_dir), memory_hard_limit_mb=4000)
-        self.lean_server = AutoLeanServer(self.lean_config)
+    def __init__(self, project_dir, lean_preamble):
+        self.project_dir = project_dir
         self.lean_preamble = lean_preamble
-        response = self.lean_server.run(Command(cmd=lean_preamble))
-        self.environment = response.env
         load_dotenv()
         self.client = genai.Client()
+        self._init_lean_server()
+    
+    def _init_lean_server(self):
+        """Initialize or reinitialize the Lean server and environment."""
+        self.lean_config = LeanREPLConfig(verbose=True, project=LocalProject(directory=self.project_dir), memory_hard_limit_mb=4000)
+        self.lean_server = AutoLeanServer(self.lean_config)
+        response = self.lean_server.run(Command(cmd=self.lean_preamble))
+        self.environment = response.env
 
     async def run_lean_check(self, lean_code):
         """Run a Lean check and return True if there are no errors."""
         try:
             response = await self.lean_server.async_run(
-                Command(cmd=lean_code, env=0), timeout=TIMEOUT
+                Command(cmd=lean_code, env=self.environment), timeout=TIMEOUT
             )
             match response:
                 case CommandResponse():
                     messages = response.messages
                     errors = [m for m in messages if m.severity == "error"]
+                    print(errors)
                     if errors:
-                        print(f"❌ Lean check failed: {errors[0].data}")
                         return False
                     else:
-                        print("✅ Lean check passed")
                         return True
-                case LeanError(message):
-                    print(f"❌❌ Lean error: {message}")
-                    return False
+                case LeanError():
+                    if response.message == 'Unknown environment.':
+                        self._init_lean_server()
+                        # Retry once with fresh environment
+                        response = await self.lean_server.async_run(
+                            Command(cmd=lean_code, env=self.environment), timeout=TIMEOUT
+                        )
+                        match response:
+                            case CommandResponse():
+                                messages = response.messages
+                                errors = [m for m in messages if m.severity == "error"]
+                                print(errors)
+                                return len(errors) == 0
+                            case LeanError():
+                                print(response.message)
+                                return False
+                    else:
+                        print(response.message)
+                        return False
         except asyncio.TimeoutError:
-            print(f"⏰ Lean timed out (> {TIMEOUT}s)")
+            print("Lean check timed out.")
             return False
 
     async def check_proves(self, conjecture):
@@ -73,12 +94,13 @@ class Validator:
         """
         parsed_expr = lean_parse.parse_lean(conjecture)[0]
         parsed_expr.typ = "False"
+        parsed_expr.proof = "algebraic_euclid"
         reconstructed = parsed_expr.complete_str()
         return not await self.run_lean_check(reconstructed)
 
-    def check_not_identical(self, conjecture, examples):
+    async def check_materially_different(self, conjecture, examples):
         """Use a Gemini API call to check that the statement is not
-        identical to one of the inputs.
+        materially different to one of the inputs. This is done in batches.
         
         Args:
             conjecture: The conjecture to check.
@@ -87,14 +109,27 @@ class Validator:
         Returns:
             True if the conjecture is not identical to any of the examples, False otherwise.
         """
-        prompt = f"Is the following conjecture an original thought, or is it identical to one of the provided examples? Please only respond with 'Original' or 'Identical'.\n\nConjecture:\n{conjecture}\n\nExamples:\n"
-        for i, example in enumerate(examples):
-            prompt += f"Example {i+1}:\n{example}\n\n"
-            
-        response = self.client.models.generate_content(
-                model='gemini2.0-flash', contents=prompt)
+        batch_size = 10
+        num_batches = (len(examples) + batch_size - 1) // batch_size
         
-        return "Original" in response.text
+        yes_count = 0
+        no_count = 0
+        
+        for i in range(num_batches):
+            batch = examples[i*batch_size:(i+1)*batch_size]
+            user_prompt_str = validator_user_prompt(conjecture, batch)
+            
+            response = self.client.models.generate_content(
+                    model='models/gemini-1.5-flash', 
+                    contents=[validator_system_prompt, user_prompt_str]
+            )
+            
+            if "Yes" in response.text:
+                yes_count += 1
+            elif "No" in response.text:
+                no_count += 1
+        
+        return yes_count > no_count
 
     async def validate_conjecture(self, conjecture, examples):
         """Validate the conjecture.
@@ -112,7 +147,7 @@ class Validator:
         if not await self.check_non_trivial(conjecture):
             return "Failed: Trivial hypotheses"
             
-        if not self.check_not_identical(conjecture, examples):
-            return "Failed: Identical to an example"
+        if not await self.check_materially_different(conjecture, examples):
+            return "Failed: Not materially different"
             
         return "Success"

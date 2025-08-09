@@ -4,7 +4,6 @@ Need to parse Basic.lean to create list of all the theorems. Then, sample n dist
 theorems from this list.
 """
 import random
-import re
 
 def get_theorems(file_path):
     """Parse the Lean file to get a list of theorems.
@@ -28,7 +27,7 @@ def get_theorems(file_path):
     cleaned_theorems = []
     for theorem in theorems:
         # Remove the proof
-        theorem_statement = theorem.split(':= by')[0]
+        theorem_statement = "theorem " + theorem
         # Strip leading/trailing whitespace
         cleaned_theorems.append(theorem_statement.strip())
         

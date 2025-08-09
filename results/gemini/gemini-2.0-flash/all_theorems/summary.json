@@ -1,0 +1,9 @@
+{
+  "model_type": "gemini",
+  "model_name": "gemini-2.0-flash",
+  "n_trials": 1,
+  "results_summary": {
+    "Failed: Does not prove": 1
+  },
+  "success_rate": 0.0
+}
