@@ -98,6 +98,30 @@ class Validator:
         reconstructed = parsed_expr.complete_str()
         return not await self.run_lean_check(reconstructed)
 
+    async def check_conclusion_non_trivial(self, conjecture):
+        """Check that the conclusion of the conjecture is not provable without hypotheses.
+        
+        Args:
+            conjecture: The conjecture.
+            
+        Returns:
+            True if the conclusion is non-trivial, False otherwise.
+        """
+        parsed_expr = lean_parse.parse_lean(conjecture)[0]
+        
+        # Create a new theorem with no hypotheses
+        conclusion_only_expr = type(parsed_expr)(
+            name=parsed_expr.name + "_conclusion_only",
+            params=[], # No hypotheses
+            typ=parsed_expr.typ,
+            proof="algebraic_euclid"
+        )
+        
+        reconstructed = conclusion_only_expr.complete_str()
+        
+        # If it proves, then the conclusion is trivial
+        return not await self.run_lean_check(reconstructed)
+
     async def check_materially_different(self, conjecture, examples):
         """Use a Gemini API call to check that the statement is not
         materially different to one of the inputs. This is done in batches.
@@ -146,6 +170,9 @@ class Validator:
         
         if not await self.check_non_trivial(conjecture):
             return "Failed: Trivial hypotheses"
+            
+        if not await self.check_conclusion_non_trivial(conjecture):
+            return "Failed: Trivial conclusion"
             
         if not await self.check_materially_different(conjecture, examples):
             return "Failed: Not materially different"

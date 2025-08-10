@@ -162,3 +162,21 @@ async def test_validator_timeout_recovery():
     complex_theorem = "theorem timeout_test (A B C D E F G H I J : EuclidPoint) : A = A := by rfl"
     result = await val.run_lean_check(complex_theorem)
     assert result
+
+@pytest.mark.asyncio
+async def test_validator_conclusion_non_trivial():
+    val = validator.Validator(".", preamble)
+    good_conjecture = """theorem CircleMidpointChordPerpendicular
+  (h1 : |O - A| = |O - B|)
+  (h2 : isMidpoint M (A - B))
+  (h3 : |A - B| ≠ 0)
+  : (O - M) ⊥ (A - B) := by algebraic_euclid"""
+    result = await val.check_conclusion_non_trivial(good_conjecture)
+    assert result
+
+@pytest.mark.asyncio
+async def test_validator_conclusion_trivial():
+    val = validator.Validator(".", preamble)
+    bad_conjecture = "theorem trivial_conclusion (A B C : EuclidPoint) : (A - B) || (A - B) := by algebraic_euclid"
+    result = await val.check_conclusion_non_trivial(bad_conjecture)
+    assert not result
