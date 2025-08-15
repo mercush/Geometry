@@ -57,13 +57,10 @@ class Validator:
                             case CommandResponse():
                                 messages = response.messages
                                 errors = [m for m in messages if m.severity == "error"]
-                                print(errors)
                                 return len(errors) == 0
                             case LeanError():
-                                print(response.message)
                                 return False
                     else:
-                        print(response.message)
                         return False
         except asyncio.TimeoutError:
             print("Lean check timed out.")
@@ -78,7 +75,11 @@ class Validator:
         Returns:
             True if the conjecture is provable, False otherwise.
         """
-        parsed_expr = lean_parse.parse_lean(conjecture)[0]
+        try:
+            parsed_expr = lean_parse.parse_lean(conjecture)[0]
+        except IndexError:
+            print("Failed to parse", conjecture)
+            return False
         parsed_expr.proof = 'algebraic_euclid'
         reconstructed = parsed_expr.complete_str()
         return await self.run_lean_check(reconstructed)

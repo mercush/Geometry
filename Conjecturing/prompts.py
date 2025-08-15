@@ -51,14 +51,14 @@ Your conjectures must be:
 - **Flat angle**: `∟T + ∟T` (180 degrees)
 
 ### Theorem Structure Template
-```lean
 theorem TheoremName
-  (h1 : Col A B C)                 -- Geometric constraints
-  (h2 : |P - O|^2 = |Q - O|^2)     -- Distance/circle conditions  
-  (h3 : (A - B) ⊥ (C - D))         -- Perpendicularity
-  (h4 : isMidpoint M (A - B))      -- Special point constructions
-  (h5 : Noncol A B C)              -- Non-degeneracy conditions
-  (h6 : |A - B| ≠ 0)               -- Non-zero length conditions
+  -- Hypotheses using geometric predicates
+  (h1 : Col A B C)
+  (h2 : |M - G1| = |A - G1|)  -- M on circle G1 through A
+  (h3 : (C - M) ⊥ (B - A))   -- Perpendicularity
+  -- Non-degeneracy conditions
+  (nondeg1 : A ≠ B)
+  (nondeg2 : ¬Col A B C)
   :
   |E - F|^2 = |G - H|^2            -- Conclusion (prefer squared distances)
   := by algebraic_euclid
@@ -71,10 +71,9 @@ theorem TheoremName
 - **Include non-degeneracy conditions** like `Noncol A B C` or `|A - B| ≠ 0` to avoid trivial cases
 - **Use `¬` for negation** in conditions like `¬(A - B) || (C - D)`
 - **The `algebraic_euclid` tactic** can prove any true statement expressible in this coordinate geometry system
-- **Avoid intermediate variables** - no `let` statements allowed
 
 ## Output Format
-Provide only the theorem statement without explanations, markdown code blocks, or additional text."""
+"""
 
 def user_prompt(examples):
     """Create the user prompt.    Args:
@@ -85,6 +84,38 @@ def user_prompt(examples):
     for i, example in enumerate(examples):
         prompt += f"Example {i+1}:\n{example}\n\n"
     prompt += "Please make a conjecture based on these examples."
+
+"""
+"""
+
+preamble = """import Geometry
+variable (C D E F G H I J K L
+  M N O P Q R S T U V X Y Z : EuclidPoint)
+
+abbrev A := EuclidPoint.mk 0 0
+abbrev B := EuclidPoint.mk 0 1
+
+set_option autoImplicit false
+"""
+
+validator_system_prompt = """You are an expert in Euclidean geometry. Your task is to
+     determine if a given 'Conjecture' is materially different from a list of 'Examples'.
+   2
+   3 1.  **Analyze the geometric statements.** Do not focus on the specific point names (e.g.,
+     A, B, C).
+   4 2.  **Ignore non-degeneracy conditions.** Conditions like `Noncol A B C` or `|A - B| ≠ 0`
+     should not be the basis for your decision.
+   5 3.  **Focus on the core geometric claim.** Is the main idea of the conjecture already
+     expressed in one of the examples?
+   6 4.  **Respond with only 'Yes' or 'No'.** 'Yes' means it is materially different. 'No' means
+     it is not.
+   7 """
+
+def validator_user_prompt(conjecture, examples_batch):
+    """Creates the user prompt for the validator."""
+    prompt = f"Conjecture:\n{conjecture}\n\nExamples:\n"
+    for i, example in enumerate(examples_batch):
+        prompt += f"Example {i+1}:\n{example}\n\n"
     return prompt
 
 preamble = """import Geometry

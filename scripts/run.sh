@@ -1,9 +1,11 @@
-#!bash
+#!/bin/bash
 source venv/bin/activate
 python Conjecturing/eval.py \
-	-n 1 \
-	-t 8 \
-	--model_type gemini \
-	-m "gemini-2.0-flash" \
-	-p "."
-
+	--n_trials 50 \
+	--tensor_parallel_size 1 \
+	--model_type featherless \
+	--model_name "AI-MO/Kimina-Prover-72B" \
+	--project_dir "." \
+	--with_cot False \
+	--max_tokens 250
+deactivate
