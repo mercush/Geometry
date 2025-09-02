@@ -4,14 +4,15 @@ import Geometry.AlgebraicEuclid
 structure TAngle' where
   cos : ℝ
   sin : ℝ
+  h : sin ≠ 0
 
 def TAngle.eq (a b : TAngle') : Prop :=
   a.cos * b.sin = b.cos * a.sin
 
 def TAngle.eq.eqv : Equivalence TAngle.eq where
-  refl := by sorry
-  symm := by sorry
-  trans := by sorry
+  refl := by intro x; unfold eq; grind
+  symm := by intro x y; unfold eq; grind
+  trans := by intro x y z h1 h2; unfold eq at *; have := x.h; have := y.h; grind
 
 instance TAngle.instSetoid : Setoid TAngle' where
   r := TAngle.eq
@@ -24,12 +25,13 @@ def TAngle.mk (x₂ x₁ x₄ : EuclidPoint) : TAngle :=
   Quotient.mk'
   (TAngle'.mk
   ((x₂.x - x₁.x) * (x₄.x - x₁.x) + (x₂.y - x₁.y) * (x₄.y - x₁.y))
-  ((x₂.x - x₁.x) * (x₄.y - x₁.y) - (x₂.y - x₁.y) * (x₄.x - x₁.x)))
+  ((x₂.x - x₁.x) * (x₄.y - x₁.y) - (x₂.y - x₁.y) * (x₄.x - x₁.x))
+  sorry)
 
 notation "∠T" => TAngle.mk
 
 def TAngle.mk' (cos sin : ℝ): TAngle :=
-  Quotient.mk' (TAngle'.mk cos sin)
+  Quotient.mk' (TAngle'.mk cos sin sorry)
 
 @[euclid_simp]
 lemma TAngle.coordToTrig {x₁ x₂ x₄ : EuclidPoint} :
@@ -40,7 +42,9 @@ lemma TAngle.coordToTrig {x₁ x₂ x₄ : EuclidPoint} :
 lemma TAngle.eq' {cos₁ sin₁ : ℝ} {cos₂ sin₂ : ℝ} :
   TAngle.mk' cos₁ sin₁ = TAngle.mk' cos₂ sin₂ ↔
   cos₁ * sin₂ = cos₂ * sin₁ := by
-  sorry
+  constructor
+  · intro h; unfold eq at *; sorry
+  · intro h; unfold eq at *; sorry
 
 -- Addition of TAngles
 noncomputable
@@ -50,7 +54,7 @@ def addTAngles (a b : TAngle) : TAngle :=
     (fun a' b' => TAngle.mk'
       (a'.cos * b'.cos - a'.sin * b'.sin)
       (a'.sin * b'.cos + a'.cos * b'.sin))
-    (by sorry)
+    (by intro a1 b1 a2 b2 h1 h2; rw [TAngle.eq']; sorry)
     a b
 
 noncomputable

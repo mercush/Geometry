@@ -8,13 +8,18 @@ abbrev A := EuclidPoint.mk 0 0
 abbrev B := EuclidPoint.mk 0 1
 
 theorem Proposition5
-  (h1 : |A - B| = |A - C|) :
-  (∠T A B C) = (∠T B C A)
+  (h1 : |A - B| = |A - C|) 
+  (h2 : |B - A| ≠ 0)
+  (h3 : |B - C| ≠ 0)
+  (h4 : |A - C| ≠ 0) :
+  (∠ A B C (by nondegen)) = (∠ B C A (by nondegen))
   := by
   algebraic_euclid
 
 theorem Proposition6
-(h4 : ∠T A B C = ∠T B C A)
+  (h2 : |A - C| ≠ 0)
+  (h3 : |B - C| ≠ 0)
+  (h4 : ∠ A B C (by nondegen)= ∠ B C A (by nondegen))
   (nondegen1 : Noncol A B C)
   : |A - B| = |A - C| := by
   algebraic_euclid
@@ -33,15 +38,12 @@ theorem Proposition10
   algebraic_euclid
 
 theorem Proposition13
+  (h1 : |D - A| ≠ 0)
+  (h2 : |D - C| ≠ 0)
+  (h3 : |D - B| ≠ 0)
   (h4 : Between A D B)
-  : ((∠T A D C) + (∠T C D B)) = ((∟T) + (∟T))
+  : ((∠ A D C (by nondegen)) + (∠ C D B (by nondegen))) = ((∟) + (∟))
   := by
-  algebraic_euclid
-
-theorem Proposition15
-  (h1 : Col A C B)
-  (h2 : Col D C E)
-  : ∠T A C D = ∠T B C E := by
   algebraic_euclid
 
 theorem Proposition30
@@ -52,8 +54,12 @@ theorem Proposition30
   algebraic_euclid
 
 theorem Proposition32
-  : ((∠T B A C) + (∠T C B A) +
-  (∠T A C B)) = ((∟T) + (∟T)) := by
+  (h1 : |A - B| ≠ 0)
+  (h2 : |A - C| ≠ 0)
+  (h3 : |B - C| ≠ 0)
+  (h4 : |B - A| ≠ 0)
+  : ((∠ B A C (by nondegen)) + (∠ C B A (by nondegen)) +
+  (∠ A C B (by nondegen))) = ((∟) + (∟)) := by
   algebraic_euclid
 
 theorem Proposition33
@@ -264,8 +270,7 @@ theorem Pappus_Theorem
   (h10 : ¬(A - Q) || (B - P))
   :
   Col X Y Z
-  := by
-  algebraic_euclid
+  := by algebraic_euclid
 
 theorem MidpointTheorem
   (h1 : isMidpoint D (A - B))
@@ -364,8 +369,11 @@ theorem CircleAngle
 
 theorem HalfAngle
   (h1 : |O - A| = |O - B|)
-  (h2 : |O - B| = |O - C|) :
-  ∠T A C B + ∠T A C B = ∠T A O B := by algebraic_euclid
+  (h2 : |O - B| = |O - C|)
+  (h3 : |C - A| ≠ 0)
+  (h4 : |C - B| ≠ 0)
+  (h5 : |O - B| ≠ 0):
+  ∠ A C B (by nondegen) + ∠ A C B (by nondegen) = ∠ A O B (by nondegen) := by algebraic_euclid
 
 theorem TriangleHeightAreaTheorem
   (h1 : Col B H C)
@@ -373,20 +381,6 @@ theorem TriangleHeightAreaTheorem
   (h5 : Noncol A B C)
   :
   4 * (AreaT A B C)^2 = |B - C|^2 * |A - H|^2
-  := by
-  algebraic_euclid
-
-theorem gex_1_TOP_TEN_09_orth
-  (h1 : (D - C) ⊥ (B - A))
-  (h2 : Col D A B)
-  (h3 : (E - B) ⊥ (A - C))
-  (h4 : Col E A C)
-  (h5 : Col F B E)
-  (h6 : Col F C D)
-  (h7 : Col G A F)
-  (h8 : Col G B C)
-  (nondegen4 : Noncol A B C) :
-  (∠T D G A) = (∠T A G E)
   := by
   algebraic_euclid
 

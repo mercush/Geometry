@@ -1,2 +1,2 @@
 import Geometry.Tactic
-import Geometry.Angles
+import Geometry.Wu.Pseudodivision
