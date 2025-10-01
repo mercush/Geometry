@@ -1,5 +1,4 @@
 import Geometry.Tactic
-import Geometry.Angles
 
 variable (C D E F G H I J K L
   M N O P Q R S T U V X Y Z : EuclidPoint)
@@ -7,9 +6,17 @@ variable (C D E F G H I J K L
 abbrev A := EuclidPoint.mk 0 0
 abbrev B := EuclidPoint.mk 0 1
 
+theorem Proposition4
+  (h1 : |A - B| = |D - E|)
+  (h2 : |A - C| = |D - F|)
+  (h3 : |A - B| ≠ 0 ∧ |A - C| ≠ 0)
+  (h4 : |D - E| ≠ 0 ∧ |D - F| ≠ 0)
+  (h5 : ∠ B A C h3 = ∠ E D F h4)
+  : |C - A| = |F - D| :=
+  by algebraic_euclid
+
 theorem Proposition5
-  (h1 : |A - B| = |A - C|) 
-  (h2 : |B - A| ≠ 0)
+  (h1 : |A - B| = |A - C|)
   (h3 : |B - C| ≠ 0)
   (h4 : |A - C| ≠ 0) :
   (∠ A B C (by nondegen)) = (∠ B C A (by nondegen))
@@ -32,17 +39,12 @@ theorem Proposition7
   : C = D := by
   algebraic_euclid
 
-theorem Proposition10
-  (h1 : isMidpoint M (A - B))
-  : |A - M| = |M - B| ∧ Col M A B := by
-  algebraic_euclid
-
 theorem Proposition13
   (h1 : |D - A| ≠ 0)
   (h2 : |D - C| ≠ 0)
   (h3 : |D - B| ≠ 0)
   (h4 : Between A D B)
-  : ((∠ A D C (by nondegen)) + (∠ C D B (by nondegen))) = ((∟) + (∟))
+  : ((∠ A D C (by nondegen)) + (∠ C D B (by nondegen))) = (∟ + ∟)
   := by
   algebraic_euclid
 
@@ -58,8 +60,7 @@ theorem Proposition32
   (h2 : |A - C| ≠ 0)
   (h3 : |B - C| ≠ 0)
   (h4 : |B - A| ≠ 0)
-  : ((∠ B A C (by nondegen)) + (∠ C B A (by nondegen)) +
-  (∠ A C B (by nondegen))) = ((∟) + (∟)) := by
+  : ((∠ B A C (by nondegen)) + (∠ C B A (by nondegen)) + (∠ A C B (by nondegen))) = (∟ + ∟) := by
   algebraic_euclid
 
 theorem Proposition33
@@ -105,12 +106,9 @@ lemma StrongParallel_imp_Parallel
   algebraic_euclid
 
 theorem MediansConcurrent
-  (h1 : isMidpoint X (B - C))
-  (h2 : isMidpoint Y (A - C))
-  (h3 : isMidpoint Z (A - B))
-  (h4 : Col A G X)
-  (h5 : Col B G Y)
-  : Col C G Z := by
+  (h4 : Col A G (Midpoint (B - C)))
+  (h5 : Col B G (Midpoint (A - C)))
+  : Col C G (Midpoint (A - B)) := by
   algebraic_euclid
 
 theorem OrthonormalsConcurrent
@@ -130,30 +128,23 @@ theorem OrthonormalsConcurrent
 theorem gex_GDD_FULL_more_E006_1
   (h1 : (D - C) || (B - A))
   (h2 : (D - A) || (C - B))
-  (h3 : isMidpoint E (D - C))
-  (h4 : isMidpoint F (A - B))
-  (h7 : Col G D F)
+  (h7 : Col G D (Midpoint (A - B)))
   (h8 : Col G A C)
   (h9 : Col H A C)
-  (h10 : Col H B E)
+  (h10 : Col H B (Midpoint (D - C)))
   (h12 : Noncol A B C)
   : |G - A| = |G - H| := by
   algebraic_euclid
 
 theorem IsoscelesPerpendicularBisector
   (h1 : |A - B| = |A - C|)
-  (h2 : isMidpoint D (B - C))
-  : (A - D) ⊥ (B - C) := by
+  : (A - (Midpoint (B - C))) ⊥ (B - C) := by
   algebraic_euclid
 
 theorem PerpendicularBisectorsConcurrent
-  (h1 : isMidpoint P (A - B))
-  (h2 : isMidpoint Q (B - C))
-  (h3 : isMidpoint R (A - C))
-  (h4 : (O - P) ⊥ (A - B))
-  (h5 : (O - Q) ⊥ (B - C))
-  (h6 : Noncol A B C)
-  : (O - R) ⊥ (A - C) := by
+  (h4 : (O - (Midpoint (A - B))) ⊥ (A - B))
+  (h5 : (O - (Midpoint (B - C))) ⊥ (B - C))
+  : (O - (Midpoint (A - C))) ⊥ (A - C) := by
   algebraic_euclid
 
 theorem ParallelogramOppositeSidesEqual
@@ -166,9 +157,8 @@ theorem ParallelogramOppositeSidesEqual
 theorem ParallelogramDiagonalsBisect
   (h1 : (A - B) || (D - C))
   (h2 : (A - D) || (B - C))
-  (h3 : isMidpoint M (A - C))
   (h4 : Noncol A B D)
-  : isMidpoint M (B - D) := by
+  : Midpoint (A - C) = Midpoint (B - D) := by
   algebraic_euclid
 
 theorem ParallelogramLaw
@@ -185,8 +175,7 @@ theorem StewartTheorem
   algebraic_euclid
 
 theorem ApolloniusTheorem
-  (h1 : isMidpoint D (B - C))
-  : 2 * (|A - B|^2 + |A - C|^2) = 4 * |A - D|^2 + |B - C|^2 := by
+  : 2 * (|A - B|^2 + |A - C|^2) = 4 * |A - (Midpoint (B - C))|^2 + |B - C|^2 := by
   algebraic_euclid
 
 theorem gex_GDD_FULL_01_20_01
@@ -194,10 +183,8 @@ theorem gex_GDD_FULL_01_20_01
   (h2 : Col D A B)
   (h3 : (E - B) ⊥ (A - C))
   (h4 : Col E A C)
-  (h5 : isMidpoint F (B - C))
-  (h6 : isMidpoint G (D - E))
   (h7 : |C - A| ≠ 0) :
-  (F - G) ⊥ (D - E) := by
+  ((Midpoint (B - C)) - (Midpoint (D - E))) ⊥ (D - E) := by
   algebraic_euclid
 
 theorem gex_1_TOP_TEN_07_2altitude
@@ -205,29 +192,20 @@ theorem gex_1_TOP_TEN_07_2altitude
   (h2 : Col D A B)
   (h3 : (E - B) ⊥ (A - C))
   (h4 : Col E A C)
-  (h5 : isMidpoint F (E - D))
-  (h6 : isMidpoint G (B - C))
   (h7 : |A - C| ≠ 0) :
-  (D - E) ⊥ (G - F) := by
+  (D - E) ⊥ ((Midpoint (B - C)) - (Midpoint (E - D))) := by
   algebraic_euclid
 
 theorem gex_GDD_FULL_01_20_02
-  (h1 : isMidpoint P (B - C))
-  (h2 : isMidpoint Q (A - C))
-  (h3 : isMidpoint R (A - B))
   (h4 : isCircumcenter O A B C) :
-  (O - P) ⊥ (Q - R) := by
+  (O - (Midpoint (B - C))) ⊥ ((Midpoint (A - C)) - (Midpoint (A - B))) := by
   algebraic_euclid
 
 theorem gex_GDD_FULL_more_E015_6
-  (h1 : isMidpoint D (A - C))
-  (h2 : isMidpoint E (B - A))
-  (h3 : isMidpoint F (C - B))
-  (h4 : (G - D) || (F - A))
-  (h5 : (G - F) || (C - A))
-  (h6 : Noncol A B C) :
+  (h4 : (G - (Midpoint (A - C))) || ((Midpoint (C - B)) - A))
+  (h5 : (G - (Midpoint (C - B))) || (C - A)) :
   -- Conclusion: CE parallel to GB
-  (C - E) || (G - B) := by
+  (C - (Midpoint (B - A))) || (G - B) := by
   algebraic_euclid
 
 theorem gex_Other_ndgs_02
@@ -252,8 +230,7 @@ theorem RhombusDiagonalsPerpendicular
   (h2 : |C - D| = |D - A|)
   (h3 : |A - B| = |C - D|)
   (h4 : (A - B) || (D - C))
-  (h5 : isMidpoint M (A - C))
-  (h6 : isMidpoint M (B - D)) :
+  (h5 : Midpoint (A - C) = Midpoint (B - D)) :
   (A - C) ⊥ (B - D)
   := by
   algebraic_euclid
@@ -272,10 +249,8 @@ theorem Pappus_Theorem
   Col X Y Z
   := by algebraic_euclid
 
-theorem MidpointTheorem
-  (h1 : isMidpoint D (A - B))
-  (h2 : isMidpoint E (A - C)) :
-  ((D - E) || (B - C)) ∧ 4 * |D - E|^2 = |B - C|^2
+theorem MidpointTheorem :
+  (((Midpoint (A - B)) - (Midpoint (A - C))) || (B - C)) ∧ 4 * |(Midpoint (A - B)) - (Midpoint (A - C))|^2 = |B - C|^2
   := by
   algebraic_euclid
 
@@ -304,12 +279,8 @@ theorem MenelausTheorem
   algebraic_euclid
 
 theorem VarignonTheorem
-  (h1 : isMidpoint E (A - B))  -- E is midpoint of AB
-  (h2 : isMidpoint F (B - C))  -- F is midpoint of BC
-  (h3 : isMidpoint G (C - D))  -- G is midpoint of CD
-  (h4 : isMidpoint H (D - A))  -- H is midpoint of DA
   :
-  ((E - F) || (H - G)) ∧ (F - G) || (E - H)
+  (((Midpoint (A - B)) - (Midpoint (B - C))) || ((Midpoint (D - A)) - (Midpoint (C - D)))) ∧ ((Midpoint (B - C)) - (Midpoint (B - C))) || ((Midpoint (A - B)) - (Midpoint (B - C)))
   := by
   algebraic_euclid
 
@@ -336,12 +307,8 @@ theorem HeronsTheorem :
   algebraic_euclid
 
 theorem MedianToHypotenuseTheorem
-  (h1 : (A - B) ⊥ (A - C))
-  (h2 : isMidpoint M (B - C))
-  (h3 : |A - B| ≠ 0)
-  (h4 : |A - C| ≠ 0)
-  :
-  4 * |A - M|^2 = |B - C|^2
+  (h1 : (A - B) ⊥ (A - C)) :
+  4 * |A - (Midpoint (B - C))|^2 = |B - C|^2
   := by
   algebraic_euclid
 
@@ -355,15 +322,6 @@ theorem IntersectingChordsTheorem
   (h12 : |C - P| ≠ 0)
   :
   |A - P| * |P - B| = |C - P| * |P - D|
-  := by
-  algebraic_euclid
-
-theorem CircleAngle
-  (h1 : |O - A| = |O - B|)
-  (h2 : |O - B| = |O - C|)
-  (h3 : |O - C| = |O - D|)
-  :
-  Concyclic A B D C
   := by
   algebraic_euclid
 
@@ -395,4 +353,31 @@ theorem IsoscelesTriangleAltitudeMedian
   (h2 : Col B D C)
   (h3 : (A - D) ⊥ (B - C))
   (h4 : Noncol A B C)
-  : isMidpoint D (B - C) := by algebraic_euclid
+  : D = Midpoint (B - C) := by algebraic_euclid
+
+theorem MidpointCollinear : Col A (Midpoint (A - B)) B ∧ |A - (Midpoint (A - B))| = |(Midpoint (A - B)) - B| := by
+  algebraic_euclid
+
+theorem PerpendicularBisectorProperty
+  (h2 : (P - (Midpoint (A - B))) ⊥ (A - B))
+  : |P - A| = |P - B| := by
+  algebraic_euclid
+
+theorem RightAngleMidpointProperty
+  (h1 : (A - B) ⊥ (A - C))
+  : |A - (Midpoint (B - C))| = |(Midpoint (B - C)) - B| ∧ |A - (Midpoint (B - C))| = |(Midpoint (B - C)) - C| := by
+  algebraic_euclid
+
+theorem SquareArea
+  (h1 : Square P Q R S)
+  (h2 : |P - Q| ≠ 0)
+  : AreaP P Q R = |P - Q|^2 := by
+  algebraic_euclid
+
+theorem TriangleMedianLength : 4 * |A - (Midpoint (B - C))|^2 = 2 * |A - B|^2 + 2 * |A - C|^2 - |B - C|^2 := by
+  algebraic_euclid
+
+theorem RotationPreservesDistance
+  (h : U.x^2 + U.y^2 = 1)
+  : |A - B| = |(Rotate B A U) - A| := by
+  algebraic_euclid

@@ -88,7 +88,3 @@ lemma WeakTAngleEq_def (cos₁ sin₁ norm₁ : ℝ) (nonzero₁ : norm₁ ≠ 0
   WeakTAngleEq (TAngle.mk' cos₁ sin₁) (TAngle.mk' cos₂ sin₂) ↔
   cos₁ * norm₂ = cos₂ * norm₁ := by
   sorry
-
-@[euclid_simp]
-def Concyclic (A B C D : EuclidPoint) : Prop :=
-  (∠T A B D) = (∠T A C D)

@@ -57,7 +57,11 @@ lemma Segment.length_sq_eq {a b : EuclidPoint}: |a - b| ^ 2 = (a.x - b.x) ^ 2 + 
 
 grind_pattern Segment.length_sq_eq => |a - b|
 
--- @[euclid_simp]
+lemma Segment.geq_zero {seg : Segment} :
+  0 ≤ |seg| := by
+  rw [Segment.length]
+  simp
+
 lemma Segment.length_sq_iff {s₁ s₂ : Segment} :
   |s₁| = |s₂| ↔ |s₁|^2 = |s₂|^2 := by
   constructor
@@ -97,7 +101,7 @@ lemma Segment.length_symm {a b : EuclidPoint} :
   have h₁ : ((b.x - a.x) ^ 2 + (b.y - a.y) ^ 2) ≥ 0 := by positivity
   have h₂ : ((a.x - b.x) ^ 2 + (a.y - b.y) ^ 2) ≥ 0 := by positivity
   rw [Real.sq_sqrt h₁, Real.sq_sqrt h₂]
-  nlinarith
+  grind
 
 lemma ne_zero_iff_exist_inv {a b : EuclidPoint} :
   |a - b| ≠ 0 ↔ ∃ t, |a - b| * t = 1 := by
@@ -213,14 +217,14 @@ def Angle.mk' (cos sin norm : ℝ) (h : norm ≠ 0) : Angle :=
 --   {h₁ : |x₁ - x₂| ≠ 0} {h₂ : |x₁ - x₄| ≠ 0} :
 --   Angle.mk h₁ h₂ = Angle.mk' ((x₂.x - x₁.x) * (x₄.x - x₁.x) + (x₂.y - x₁.y) * (x₄.y - x₁.y))
 --     ((x₂.x - x₁.x) * (x₄.y - x₁.y) - (x₂.y - x₁.y) * (x₄.x - x₁.x))
---     (|x₁ - x₂| * |x₁ - x₄|) (by aesop) := rfl
+--     (|x₁ - x₂| * |x₁ - x₄|) (by grind) := rfl
 
 @[euclid_simp]
 lemma Angle.coordToTrig {x₁ x₂ x₄ : EuclidPoint}
   {h₁ : |x₁ - x₂| ≠ 0 ∧ |x₁ - x₄| ≠ 0} :
   Angle.mk x₂ x₁ x₄ h₁ = Angle.mk' ((x₂.x - x₁.x) * (x₄.x - x₁.x) + (x₂.y - x₁.y) * (x₄.y - x₁.y))
     ((x₂.x - x₁.x) * (x₄.y - x₁.y) - (x₂.y - x₁.y) * (x₄.x - x₁.x))
-    (|x₁ - x₂| * |x₁ - x₄|) (by aesop) := rfl
+    (|x₁ - x₂| * |x₁ - x₄|) (by grind) := rfl
 
 @[euclid_simp]
 lemma Angle.eq' {cos₁ sin₁ norm₁ : ℝ} {nonzero₁ : norm₁ ≠ 0}
@@ -418,8 +422,8 @@ notation seg₁ " ||| " seg₂ => StrongParallel seg₁ seg₂
 
 @[euclid_simp]
 noncomputable
-def isMidpoint (A : EuclidPoint) (seg : Segment) : Prop :=
-  2 * A.x = (seg.start.x + seg.endpoint.x) ∧ 2 * A.y = (seg.start.y + seg.endpoint.y)
+def Midpoint (seg : Segment) : EuclidPoint :=
+  EuclidPoint.mk (2⁻¹ * (seg.start.x + seg.endpoint.x)) (2⁻¹ *(seg.start.y + seg.endpoint.y))
 
 @[euclid_simp]
 def isCircumcenter (O A B C : EuclidPoint) : Prop :=
@@ -554,7 +558,17 @@ def isIncenter (I A B C : EuclidPoint) : Prop :=
 def isFoot (F P A B : EuclidPoint) : Prop :=
   Col F A B ∧ (P - F) ⊥ (A - B)
 
--- Reflection of point P across line AB
 @[euclid_simp]
-def isReflection (P' P A B : EuclidPoint) : Prop :=
-  ∃ (M : EuclidPoint), isMidpoint M (P - P') ∧ ((P - P') ⊥ (A - B)) ∧ Col M A B
+def Concyclic (A B C D : EuclidPoint) (h : |B - A| ≠ 0 ∧ |B - D| ≠ 0 ∧ |C - A| ≠ 0 ∧ |C - D| ≠ 0): Prop :=
+  (∠ A B D (by constructor; exact h.1; exact h.2.1)) = (∠ A C D (by constructor; exact h.2.2.1; exact h.2.2.2))
+
+-- Rotation of a point around a center by a unit vector (ux, uy)
+-- The unit vector (ux, uy) satisfies ux^2 + uy^2 = 1
+-- and represents the rotation: (ux, uy) = (cos θ, sin θ)
+@[euclid_simp]
+def Rotate (P : EuclidPoint) (center : EuclidPoint) (u : EuclidPoint) : EuclidPoint :=
+  let dx := P.x - center.x
+  let dy := P.y - center.y
+  EuclidPoint.mk
+    (center.x + dx * u.x - dy * u.y)
+    (center.y + dx * u.y + dy * u.x)
