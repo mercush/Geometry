@@ -1,5 +1,0 @@
-{
-  "conjecture": "theorem  Circumcenter_Altitude_Collinear\n  (h1 : isCircumcenter O A B C)\n  (h2 : isFoot D A B C)\n  (h3 : (A - D) \u22a5 (B - C))\n  (h4 : Noncol A B C)\n  : Col O D A := by algebraic_euclid\n",
-  "valid": false,
-  "failure_reason": "Failed: Does not prove"
-}
